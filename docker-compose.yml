@@ -1,0 +1,35 @@
+services:
+  db:
+    container_name: postgres_fastapi
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: dinhdat201fb
+      POSTGRES_DB: Kiosk 
+    volumes:
+      - ./postgres_db:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - fast_api
+    ports:
+      - "5433:5432"
+
+  app:
+    container_name: recep
+    build:
+      context: ./server
+    env_file:
+      - ./server/.env
+    volumes:
+      - ./server:/server
+    ports:
+      - "9991:8000"
+    restart: unless-stopped
+    depends_on:
+      - db
+    networks:
+      - fast_api
+
+networks:
+  fast_api:
+    driver: bridge

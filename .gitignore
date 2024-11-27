@@ -1,0 +1,6 @@
+postgres_db/
+*.db
+.env
+
+recep/
+**/__pycache__/
