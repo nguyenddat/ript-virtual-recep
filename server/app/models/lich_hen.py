@@ -2,9 +2,9 @@ from sqlalchemy import Integer, String, Boolean, ForeignKey
 from sqlalchemy import Column as cl
 from sqlalchemy.orm import relationship
 
-from app.models.base_class import BareBaseModel, Base
-from app.models.cuoc_hen import CuocHen
-from app.models.nguoi_dung import NguoiDung
+from models.base_class import BareBaseModel, Base
+from models.cuoc_hen import CuocHen
+from models.nguoi_dung import NguoiDung
 
 class LichHen(Base):
     __tablename__ = "lich_hen"

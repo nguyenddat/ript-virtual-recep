@@ -6,18 +6,18 @@ from pydantic import EmailStr, BaseModel
 from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
-from app.db.base import get_db
-from app.core.security import create_access_token, get_password_hash, verify_password
-from app.core.config import settings
-from app.schemas.base import DataResponse
-from app.schemas.token import Token
-from app.schemas.user import UserCreateRequest
-from app.schemas.user_base import UserCreate, UserResponse
-from app.services.srv_user import UserService
-from app.models.nguoi_dung import NguoiDung
-from app.models.sinh_vien import SinhVien
-from app.models.can_bo import CanBo
-from app.models.khach import Khach
+from db.base import get_db
+from core.security import create_access_token, get_password_hash, verify_password
+from core.config import settings
+from schemas.base import DataResponse
+from schemas.token import Token
+from schemas.user import UserCreateRequest
+from schemas.user_base import UserCreate, UserResponse
+from services.srv_user import UserService
+from models.nguoi_dung import NguoiDung
+from models.sinh_vien import SinhVien
+from models.can_bo import CanBo
+from models.khach import Khach
 
 router = APIRouter()
 

@@ -4,13 +4,13 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_sqlalchemy import db
 
-from app.helper.exception_handler import CustomException
-from app.helper.login_manager import login_required, PermissionRequired
-from app.helper.paging import Page, PaginationParams, paginate
-from app.schemas.base import DataResponse
-from app.schemas.user import UserItemResponse, UserCreateRequest, UserUpdateMeRequest, UserUpdateRequest
-from app.services.srv_user import UserService
-from app.models.nguoi_dung import NguoiDung
+from helper.exception_handler import CustomException
+from helper.login_manager import login_required, PermissionRequired
+from helper.paging import Page, PaginationParams, paginate
+from schemas.base import DataResponse
+from schemas.user import UserItemResponse, UserCreateRequest, UserUpdateMeRequest, UserUpdateRequest
+from services.srv_user import UserService
+from models.nguoi_dung import NguoiDung
 
 logger = logging.getLogger()
 router = APIRouter()

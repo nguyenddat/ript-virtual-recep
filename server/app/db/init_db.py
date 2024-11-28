@@ -1,9 +1,9 @@
-from app.core.config import settings
+from core.config import settings
 from server.app.models.nguoi_dung import User
-from app.helper.enums import UserRole
-from app.core.security import get_password_hash
+from helper.enums import UserRole
+from core.security import get_password_hash
 from sqlalchemy import create_engine
-from app.models.base_class import Base
+from models.base_class import Base
 from sqlalchemy.orm import sessionmaker
 
 engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True)

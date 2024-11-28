@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from app.db.base import get_db
-from app.models.cuoc_hen import CuocHen
+from db.base import get_db
+from models.cuoc_hen import CuocHen
 
 async def update_expired_status():
     with next(get_db()) as db:

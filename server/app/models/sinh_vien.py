@@ -2,8 +2,8 @@ from sqlalchemy import Integer, String, Boolean, ForeignKey
 from sqlalchemy import Column as cl
 from sqlalchemy.orm import relationship
 
-from app.models.base_class import BareBaseModel, Base
-from app.models.lop_hanh_chinh import LopHanhChinh
+from models.base_class import BareBaseModel, Base
+from models.lop_hanh_chinh import LopHanhChinh
 
 class SinhVien(Base):
     __tablename__ = "sinh_vien"

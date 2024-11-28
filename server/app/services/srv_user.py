@@ -10,12 +10,12 @@ from sqlalchemy.orm import Session
 from pydantic import ValidationError
 from starlette import status
 
-from app.db.base import get_db
-from app.models.nguoi_dung import NguoiDung
-from app.core.config import settings
-from app.core.security import verify_password, get_password_hash
-from app.schemas.token import TokenPayload
-from app.schemas.user import UserCreateRequest, UserUpdateMeRequest, UserUpdateRequest
+from db.base import get_db
+from models.nguoi_dung import NguoiDung
+from core.config import settings
+from core.security import verify_password, get_password_hash
+from schemas.token import TokenPayload
+from schemas.user import UserCreateRequest, UserUpdateMeRequest, UserUpdateRequest
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 

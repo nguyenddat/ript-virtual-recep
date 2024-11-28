@@ -2,8 +2,8 @@ from sqlalchemy import Integer, String, Boolean, ForeignKey
 from sqlalchemy import Column as cl
 from sqlalchemy.orm import relationship
 
-from app.models.base_class import BareBaseModel, Base
-from app.models.phong_ban import PhongBan
+from models.base_class import BareBaseModel, Base
+from models.phong_ban import PhongBan
 
 class CanBo(Base):
     __tablename__ = "can_bo"

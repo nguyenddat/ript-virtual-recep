@@ -3,7 +3,7 @@ import shutil
 
 from fastapi import APIRouter, UploadFile, File, HTTPException, status
 
-from app.services import WeeklySchedule
+from services import WeeklySchedule
 
 weekly_schedule = WeeklySchedule.ScheduleParser()
 

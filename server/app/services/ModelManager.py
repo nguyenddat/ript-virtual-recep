@@ -12,14 +12,14 @@ from collections import Counter
 from sqlalchemy import or_, literal
 from insightface.app import FaceAnalysis
 
-from app.core.security import get_password_hash
-from app.db.base import get_db
-from app.models.sinh_vien import SinhVien
-from app.models.can_bo import CanBo
-from app.models.khach import Khach
-from app.models.nguoi_dung import NguoiDung
-from app.models.lop_hanh_chinh import LopHanhChinh
-from app.models.phong_ban import PhongBan
+from core.security import get_password_hash
+from db.base import get_db
+from models.sinh_vien import SinhVien
+from models.can_bo import CanBo
+from models.khach import Khach
+from models.nguoi_dung import NguoiDung
+from models.lop_hanh_chinh import LopHanhChinh
+from models.phong_ban import PhongBan
 
 def cosine_similarity(a: np.array, b: np.array):
     norm_a, norm_b = norm(a), norm(b)
@@ -81,21 +81,31 @@ class KNN:
         self.data = data
     
     def add_data(self, data):
+        print(f"THỰC HIỆN THÊM DATA...")
         self.data.append(data)
+        print(f"Thêm data: {len(self.data)}")
     
     def update_data(self, cccd_id, data):
+        print(f"THỰC HIỆN CẬP NHẬT DỮ LIỆU...")
         for i in range(len(self.data)):
             if self.data[i]["y"] == cccd_id:
                 self.data[i]["X"] = data
-    
+                print(f"Cập nhật dữ liệu: {self.data[i]}")
+                return
+        print("Thêm dữ liệu...")
+        self.add_data({"X": data, "y": cccd_id})
+
     def save_data(self):
+        print(f"THỰC HIỆN LƯU DỮ LIỆU: {self.data}")
         with open(self.save_model_path, "wb") as file:
             pickle.dump(self.data, file)
     
     def delete_data(self, cccd_id):
+        print(f"THỰC HIỆN XÓA DỮ LIỆU...")
         for i in range(len(self.data)):
             if self.data[i]["y"] == cccd_id:
                 self.data.pop(i)
+                print(f"Xóa dữ liệu: {cccd_id}")
                 break
     
     def predict(self, img_array):
@@ -103,7 +113,9 @@ class KNN:
         for data in self.data:
             for face in data["X"]:
                 X.append(face)
-                y += [data["y"]]
+                y.append(data["y"])
+        print(X)
+        print(y)
         distances = []
         current_k = min(self.k, len(X))
         for i in range(len(X)):
@@ -129,6 +141,7 @@ class ModelManager:
 
         self.KNN = KNN()
         self.KNN.load_data(self.load_data())
+        print(self.KNN.data)
 
     def embed_face(self, img_array):
         img = cv2.cvtColor(img_array, cv2.COLOR_BGR2RGB)

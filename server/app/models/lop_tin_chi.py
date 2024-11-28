@@ -2,8 +2,8 @@ from sqlalchemy import Integer, String, Boolean, ForeignKey
 from sqlalchemy import Column as cl
 from sqlalchemy.orm import relationship
 
-from app.models.base_class import BareBaseModel, Base
-from app.models.hoc_phan import HocPhan
+from models.base_class import BareBaseModel, Base
+from models.hoc_phan import HocPhan
 
 class LopTinChi(Base):
     __tablename__ = "lop_tin_chi"

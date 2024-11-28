@@ -7,11 +7,11 @@ from typing import List, AnyStr, Dict, Union
 
 from sqlalchemy import update
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, HTTPException, status, WebSocketException
-from app.services import ConnectionManager, ImageManager, ModelManager, ExtractCCCD
-from app.db.base import get_db
-from app.models.sinh_vien import SinhVien
-from app.models.can_bo import CanBo
-from app.models.khach import Khach
+from services import ConnectionManager, ImageManager, ModelManager, ExtractCCCD
+from db.base import get_db
+from models.sinh_vien import SinhVien
+from models.can_bo import CanBo
+from models.khach import Khach
 
 router = APIRouter()
 connection_manager = ConnectionManager.ConnectionManager()

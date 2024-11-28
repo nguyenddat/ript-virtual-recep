@@ -2,7 +2,7 @@ from sqlalchemy import Integer, String, Boolean, ForeignKey
 from sqlalchemy import Column as cl
 from sqlalchemy.orm import relationship
 
-from app.models.base_class import BareBaseModel, Base
+from models.base_class import BareBaseModel, Base
 
 class NguoiDung(Base):
     __tablename__ = "nguoi_dung"

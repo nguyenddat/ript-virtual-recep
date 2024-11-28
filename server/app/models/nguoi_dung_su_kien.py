@@ -2,9 +2,9 @@ from sqlalchemy import Integer, String, Boolean, ForeignKey
 from sqlalchemy import Column as cl
 from sqlalchemy.orm import relationship
 
-from app.models.base_class import BareBaseModel, Base
-from app.models.nguoi_dung import NguoiDung
-from app.models.su_kien import SuKien
+from models.base_class import BareBaseModel, Base
+from models.nguoi_dung import NguoiDung
+from models.su_kien import SuKien
 
 class NguoiDung_SuKien(Base):
     __tablename__ = "nguoi_dung_su_kien"

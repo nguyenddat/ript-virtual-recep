@@ -6,16 +6,16 @@ from typing import Optional
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, HTTPException, status, UploadFile, File, Depends
 
-from app.db.base import get_db
-from app.services import ClassSchedule
-from app.models.sinh_vien import SinhVien
-from app.models.can_bo import CanBo
-from app.models.can_bo_lop_tin_chi import CanBo_LopTinChi
-from app.models.nhom_tin_chi import NhomTinChi
-from app.models.sinh_vien_nhom_tin_chi import SinhVien_NhomTinChi
-from app.models.lich_hoc import LichHoc
-from app.models.lop_tin_chi import LopTinChi
-from app.models.hoc_phan import HocPhan
+from db.base import get_db
+from services import ClassSchedule
+from models.sinh_vien import SinhVien
+from models.can_bo import CanBo
+from models.can_bo_lop_tin_chi import CanBo_LopTinChi
+from models.nhom_tin_chi import NhomTinChi
+from models.sinh_vien_nhom_tin_chi import SinhVien_NhomTinChi
+from models.lich_hoc import LichHoc
+from models.lop_tin_chi import LopTinChi
+from models.hoc_phan import HocPhan
 
 router = APIRouter()
 class_schedule = ClassSchedule.ClassSchedule()
