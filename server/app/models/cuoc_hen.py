@@ -2,7 +2,7 @@ from sqlalchemy import Integer, String, Boolean, Enum
 from sqlalchemy import Column as cl
 from sqlalchemy.orm import relationship
 
-from models.base_class import BareBaseModel, Base
+from app.models.base_class import BareBaseModel, Base
 
 class CuocHen(BareBaseModel):
     __tablename__ = "cuoc_hen"

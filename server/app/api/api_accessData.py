@@ -5,13 +5,13 @@ from sqlalchemy import literal, func
 from sqlalchemy.orm import Session
 from typing import Optional
 
-from db.base import get_db
-from models.phong_ban import PhongBan
-from models.can_bo import CanBo
-from models.sinh_vien import SinhVien
-from models.khach import Khach
-from models.nguoi_dung import NguoiDung
-from models.lop_hanh_chinh import LopHanhChinh
+from app.db.base import get_db
+from app.models.phong_ban import PhongBan
+from app.models.can_bo import CanBo
+from app.models.sinh_vien import SinhVien
+from app.models.khach import Khach
+from app.models.nguoi_dung import NguoiDung
+from app.models.lop_hanh_chinh import LopHanhChinh
 
 router = APIRouter()
 

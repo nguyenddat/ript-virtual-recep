@@ -5,20 +5,21 @@ import datetime
 import numpy as np
 import hashlib
 
+from PIL import Image
 from datetime import datetime
 from numpy.linalg import norm
 from collections import Counter
 from sqlalchemy import or_, literal
 from insightface.app import FaceAnalysis
 
-from core.security import get_password_hash
-from db.base import get_db
-from models.sinh_vien import SinhVien
-from models.can_bo import CanBo
-from models.khach import Khach
-from models.nguoi_dung import NguoiDung
-from models.lop_hanh_chinh import LopHanhChinh
-from models.phong_ban import PhongBan
+from app.core.security import get_password_hash
+from app.db.base import get_db
+from app.models.sinh_vien import SinhVien
+from app.models.can_bo import CanBo
+from app.models.khach import Khach
+from app.models.nguoi_dung import NguoiDung
+from app.models.lop_hanh_chinh import LopHanhChinh
+from app.models.phong_ban import PhongBan
 
 def cosine_similarity(a: np.array, b: np.array):
     norm_a, norm_b = norm(a), norm(b)
@@ -94,14 +95,15 @@ class KNN:
     def delete_data(self, cccd_id):
         for i in range(len(self.data)):
             if self.data[i]["y"] == cccd_id:
-                self.data.pop(i)            
+                self.data.pop(i)
+                break
     
     def predict(self, img_array):
         X, y = [], []
-        for key, value in self.data.items():
-            for face in value:
+        for data in self.data:
+            for face in data["X"]:
                 X.append(face)
-                y.append(key)
+                y += [data["y"]]
         distances = []
         current_k = min(self.k, len(X))
         for i in range(len(X)):
@@ -153,9 +155,12 @@ class ModelManager:
             try:
                 print(f"Không thể tải dữ liệu đã lưu --> Tải dữ liệu backup...")
                 for nguoi_dung in cac_sinh_vien + cac_can_bo + cac_khach:
-                    data_dir = os.path.join(os.getcwd(), "app", "data", nguoi_dung.cccd_id, "backup.pkl")
+                    data_dir = os.path.join(os.getcwd(), "app", "data", str(nguoi_dung.cccd_id), "backup.pkl")
                     with open(data_dir, "rb") as file:
                         data.append(pickle.load(file))
+                with open(self.KNN.save_model_path, "wb") as file:
+                    print(data)
+                    pickle.dump(data, file)
                 return data
             except:
                 print(f"Không thể tải dữ liệu backup --> Tải dữ liệu thủ công...")
@@ -166,12 +171,15 @@ class ModelManager:
                     for file in os.listdir(data_dir):
                         if file.endswith(".png"):
                             img_path = os.path.join(data_dir, file)
-                            image = Image.open(img_path).convert("RGB")
+                            image = np.array(Image.open(img_path).convert("RGB"))
                             faces, nums_of_people = self.embed_face(image)
-                            X.append(faces)
+                            X += faces
                     with open(os.path.join(data_dir, "backup.pkl"), "wb") as file:
                         pickle.dump({"X": X, "y": y}, file)
                     data.append({"X": X, "y": y})
+                with open(self.KNN.save_model_path, "wb") as file:
+                    print(data)
+                    pickle.dump(data, file)
                 return data
                              
     def update_data(self, data_dir, imageManager, personal_data):
@@ -188,7 +196,7 @@ class ModelManager:
                 os.remove(img)
                 continue
             else:
-                X.append(faces)
+                X += faces
         data.update({"X": X})
         self.KNN.update_data(class_dir, data)
         self.KNN.save_data()
@@ -205,12 +213,12 @@ class ModelManager:
                     sinh_vien.gioi_tinh = personal_data["Gender"]
                     sinh_vien.data = True
                     db.commit()
-                    print(f"Cập nhật thông tin cho sinh viên có sẵn: {personal_data["Identity Code"]}")
+                    print(f"Cập nhật thông tin cho sinh viên có sẵn: {personal_data['Identity Code']}")
                     db.refresh(sinh_vien)
                 else:
                     lop_hanh_chinh = db.query(LopHanhChinh).filter(LopHanhChinh.id == personal_data["department_code"]).first()
                     if not lop_hanh_chinh:
-                        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Không tìm thấy mã lớp hành chính: {personal_data["department_code"]}")
+                        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Không tìm thấy mã lớp hành chính: {personal_data['department_code']}")
                     sinh_vien_moi = SinhVien(
                         ma_sinh_vien = personal_data["personal_code"],
                         ho_ten = personal_data["Name"],
@@ -227,9 +235,9 @@ class ModelManager:
                         ngay_tao = str(datetime.now())
                     )
                     db.add(sinh_vien_moi)
-                    print(f"Tạo sinh viên mới: {personal_data["Identity Code"]}")
+                    print(f"Tạo sinh viên mới: {personal_data['Identity Code']}")
                     db.add(nguoi_dung_moi)
-                    print(f"Tạo người dùng mới: {personal_data["Identity Code"]}")
+                    print(f"Tạo người dùng mới: {personal_data['Identity Code']}")
                     db.commit()
                     db.refresh(sinh_vien_moi)
                     db.refresh(nguoi_dung_moi)
@@ -241,12 +249,12 @@ class ModelManager:
                     can_bo.gioi_tinh = personal_data["Gender"]
                     can_bo.data = True
                     db.commit()
-                    print(f"Cập nhật thông tin cho cán bộ có sẵn: {personal_data["Identity Code"]}")
+                    print(f"Cập nhật thông tin cho cán bộ có sẵn: {personal_data['Identity Code']}")
                     db.refresh(can_bo)
                 else:
                     phong_ban = db.query(PhongBan).filter(PhongBan.id == personal_data["department_code"]).first()
                     if not phong_ban:
-                        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Không tìm thấy mã phòng ban: {personal_data["department_code"]}")
+                        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Không tìm thấy mã phòng ban: {personal_data['department_code']}")
                     can_bo_moi = CanBo(
                         ma_can_bo = personal_data["personal_code"],
                         ho_ten = personal_data["Name"],
@@ -262,9 +270,9 @@ class ModelManager:
                         ngay_tao = str(datetime.now())
                     )
                     db.add(can_bo_moi)
-                    print(f"Tạo cán bộ mới: {personal_data["Identity Code"]}")
+                    print(f"Tạo cán bộ mới: {personal_data['Identity Code']}")
                     db.add(nguoi_dung_moi)
-                    print(f"Tạo người dùng mới: {personal_data["Identity Code"]}")
+                    print(f"Tạo người dùng mới: {personal_data['Identity Code']}")
                     db.commit()
                     db.refresh(can_bo_moi)
                     db.refresh(nguoi_dung_moi)
@@ -276,7 +284,7 @@ class ModelManager:
                     khach.ngay_sinh = personal_data["DOB"]
                     khach.data = True
                     db.commit()
-                    print(f"Cập nhật khách có sẵn: {personal_data["Identity Code"]}")
+                    print(f"Cập nhật khách có sẵn: {personal_data['Identity Code']}")
                 else:
                     khach_moi = Khach(
                         cccd_id = personal_data["Identity Code"],
@@ -292,9 +300,9 @@ class ModelManager:
                         ngay_tao = str(datetime.now())
                     )                    
                     db.add(khach_moi)
-                    print(f"Tạo khách mới: {personal_data["Identity Code"]}")
+                    print(f"Tạo khách mới: {personal_data['Identity Code']}")
                     db.add(nguoi_dung_moi)
-                    print(f"Tạo người dùng mới: {personal_data["Identity Code"]}")
+                    print(f"Tạo người dùng mới: {personal_data['Identity Code']}")
                     db.commit()
                     db.refresh(khach_moi)
                     db.refresh(nguoi_dung_moi)
