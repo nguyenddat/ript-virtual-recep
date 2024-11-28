@@ -2,9 +2,9 @@ from sqlalchemy import Integer, String, Boolean, ForeignKey
 from sqlalchemy import Column as cl
 from sqlalchemy.orm import relationship
 
-from models.base_class import BareBaseModel, Base
-from models.can_bo import CanBo
-from models.lop_tin_chi import LopTinChi
+from app.models.base_class import BareBaseModel, Base
+from app.models.can_bo import CanBo
+from app.models.lop_tin_chi import LopTinChi
 
 class CanBo_LopTinChi(Base):
     __tablename__ = "can_bo_lop_tin_chi"

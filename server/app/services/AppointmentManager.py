@@ -1,10 +1,10 @@
 from fastapi import HTTPException, status
 
-from db.base import get_db
-from helper.format_day import format_day, format_day_db
-from models.nguoi_dung import NguoiDung
-from models.lich_hen import LichHen
-from models.cuoc_hen import CuocHen
+from app.db.base import get_db
+from app.helper.format_day import format_day, format_day_db
+from app.models.nguoi_dung import NguoiDung
+from app.models.lich_hen import LichHen
+from app.models.cuoc_hen import CuocHen
 
 class AppointmentManager(object):
     @staticmethod

@@ -1,7 +1,7 @@
 import jwt
 
 from typing import Any, Union, Optional
-from core.config import settings
+from app.core.config import settings
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
 

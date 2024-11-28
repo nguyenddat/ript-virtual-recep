@@ -1,8 +1,8 @@
 from fastapi import HTTPException, Depends
 from passlib.context import CryptContext
 
-from models.nguoi_dung import NguoiDung
-from services.srv_user import UserService
+from app.models.nguoi_dung import NguoiDung
+from app.services.srv_user import UserService
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

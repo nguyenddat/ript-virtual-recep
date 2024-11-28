@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = os.getenv('SECRET_KEY', 'THANG GIANG NGU NHU CHO')
     API_PREFIX: str = ''
     BACKEND_CORS_ORIGINS: list = ['*']
-    DATABASE_URL: str = os.getenv('DATABASE_URL', 'postgresql://postgres:dinhdat201fb@localhost:5432/kiosk')
+    DATABASE_URL: str = os.getenv('DATABASE_URL', 'postgresql://fastapi:fastapi@192.168.30.195:5436/Kiosk')
     ACCESS_TOKEN_EXPIRE_SECONDS: int = 60 * \
         60 * 24 * 7  # Token expired after 7 days
     SECURITY_ALGORITHM: str = 'HS256'
