@@ -13,6 +13,7 @@ from app.models.cuoc_hen import CuocHen
 from app.models.sinh_vien import SinhVien
 from app.models.can_bo import CanBo
 from app.models.khach import Khach
+from app.models.phong_ban import PhongBan
 from app.services.QRmanager import QRManager
 from app.services.EmailManager import EmailManager
 
@@ -219,6 +220,7 @@ class AppointmentManager(object):
                     "thang": month,
                     "so_luong": so_luong
                 })
+        payload.sort(key = lambda x: x["thang"])
         return payload
 
     @staticmethod
@@ -244,7 +246,6 @@ class AppointmentManager(object):
     # + Các lịch hẹn gần đây ( tính trong tuần )
     @staticmethod
     def get_appointment_by_week():
-        payload = []
         today = datetime.date.today()
         start_day = today - datetime.timedelta(days=today.weekday())
         end_day = start_day + datetime.timedelta(days=6)
@@ -255,24 +256,5 @@ class AppointmentManager(object):
                     func.date(CuocHen.ngay_tao) >= start_day,
                     func.date(CuocHen.ngay_tao) <= end_day
                 )
-            ).all()
-            for cuoc_hen in cac_cuoc_hen:
-                cuoc_hen_tra_ve = {
-                    "nguoi_hen": "",
-                    "nguoi_duoc_hen": [],
-                    "ngay_gio_bat_dau": cuoc_hen.ngay_gio_bat_dau,
-                    "ngay_gio_ket_thuc": cuoc_hen.ngay_gio_ket_thuc,
-                    "dia_diem": cuoc_hen.dia_diem,
-                    "trang_thai": cuoc_hen.trang_thai,
-                    "ngay_tao": "T".join(cuoc_hen.ngay_tao.split())
-                }
-                cac_lich_hen = db.query(LichHen).filter(LichHen.lich_hen_id == cuoc_hen.id).all()
-                for lich_hen in cac_lich_hen:
-                    nguoi_dung = db.query(NguoiDung).filter(NguoiDung.cccd_id == lich_hen.cccd_id).first()
-                    thong_tin_nguoi_dung = db.query(roles[nguoi_dung.vai_tro]).filter(roles[nguoi_dung.vai_tro].cccd_id == nguoi_dung.cccd_id).first()
-                    if lich_hen.nguoi_hen is True:
-                        cuoc_hen_tra_ve["nguoi_hen"] = thong_tin_nguoi_dung.ho_ten
-                    else:
-                        cuoc_hen_tra_ve["nguoi_duoc_hen"].append(thong_tin_nguoi_dung.ho_ten)
-                payload.append(cuoc_hen_tra_ve)
-        return payload
+            ).count()
+            return cac_cuoc_hen
