@@ -5,13 +5,13 @@ from sqlalchemy import literal, func
 from sqlalchemy.orm import Session
 from typing import Optional
 
-from db.base import get_db
-from models.phong_ban import PhongBan
-from models.can_bo import CanBo
-from models.sinh_vien import SinhVien
-from models.khach import Khach
-from models.nguoi_dung import NguoiDung
-from models.lop_hanh_chinh import LopHanhChinh
+from app.db.base import get_db
+from app.models.phong_ban import PhongBan
+from app.models.can_bo import CanBo
+from app.models.sinh_vien import SinhVien
+from app.models.khach import Khach
+from app.models.nguoi_dung import NguoiDung
+from app.models.lop_hanh_chinh import LopHanhChinh
 
 router = APIRouter()
 
@@ -50,7 +50,7 @@ def get_officer_by_departments(phong_ban_id: Optional[int] = None, db = Depends(
         if phong_ban_id:
             phong_ban = db.query(PhongBan).filter(PhongBan.id == phong_ban_id).first()
             if not phong_ban:
-                return False 
+                return False
                 # raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Không tồn tại phòng ban: {str(phong_ban_id)}")
 
             base_query = base_query.filter(CanBo.phong_ban_id == phong_ban.id)
@@ -79,62 +79,33 @@ def get_officer_by_departments(phong_ban_id: Optional[int] = None, db = Depends(
         raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR, detail = Exception)
         
 @router.get("/api/identity-data/get")
-def get_identityData(db: Session = Depends(get_db)):
-    try:
-        payload = []
-        sinh_viens = db.query(SinhVien).filter(SinhVien.data.is_(True)).all()
-        for _ in sinh_viens:
-            nguoi_dung = {
-                "name": _.ho_ten,
-                "identity_code": _.cccd_id,
-                "role": "student",
-                "dob": _.ngay_sinh,
-                "gender": _.gioi_tinh,
-                "b64": []
-            }
-            cccd_id = _.cccd_id
-            data_path = os.path.join(os.getcwd(), "app", "data", cccd_id)
-            for file in os.listdir(data_path):
+def get_identityData(data: bool = True,
+                     role: Optional[str] = None,
+                     department_code: Optional[int] = None,
+                     db: Session = Depends(get_db)):
+    payload = []
+    roles = {"student": SinhVien, "officer": CanBo, "guest": Khach}
+    base_query = db.query(NguoiDung)
+    if role:
+        base_query = base_query.filter(NguoiDung.vai_tro == role)
+    nguoi_dungs = base_query.all()
+    for nguoi_dung in nguoi_dungs:
+        base_role = roles[nguoi_dung.vai_tro]
+        infor = db.query(base_role).filter(base_role.cccd_id == nguoi_dung.cccd_id, base_role.data.is_(data)).first()
+        if not infor:
+            continue
+        nguoi_dung_return = {
+            "name": infor.ho_ten,
+            "role": nguoi_dung.vai_tro,
+            "dob": infor.ngay_sinh,
+            "gender": infor.gioi_tinh,
+            "b64": []
+        }
+        if data:
+            data_dir = os.path.join(os.getcwd(), "app", "data", infor.cccd_id)
+            for file in os.listdir(data_dir):
                 if file.endswith("base64.txt"):
-                    with open(os.path.join(data_path, file), "r") as f:
-                        nguoi_dung["b64"].append(f.read())
-            payload.append(nguoi_dung)
-
-        can_bos = db.query(CanBo).filter(CanBo.data.is_(True)).all()
-        for _ in can_bos:
-            nguoi_dung = {
-                "name": _.ho_ten,
-                "identity_code": _.cccd_id,
-                "role": _.role,
-                "dob": _.ngay_sinh,
-                "gender": _.gioi_tinh,
-                "b64": []
-            }
-            cccd_id = _.cccd_id
-            data_path = os.path.join(os.getcwd(), "app", "data", cccd_id)
-            for file in os.listdir(data_path):
-                if file.endswith(".txt"):
-                    with open(os.path.join(data_path, file), "r") as f:
-                        nguoi_dung["b64"].append(f.read())
-            payload.append(nguoi_dung)
-
-        khachs = db.query(Khach).filter(Khach.data.is_(True)).all()
-        for _ in khachs:
-            nguoi_dung = {
-                "name": _.ho_ten,
-                "identity_code": _.cccd_id,
-                "role": _.role,
-                "dob": _.ngay_sinh,
-                "gender": _.gioi_tinh,
-                "b64": []
-            }
-            cccd_id = _.cccd_id
-            data_path = os.path.join(os.getcwd(), "app", "data", cccd_id)
-            for file in os.listdir(data_path):
-                if file.endswith(".txt"):
-                    with open(os.path.join(data_path, file), "r") as f:
-                        nguoi_dung["b64"].append(f.read())
-            payload.append(nguoi_dung)
-        return {"success": True, "payload": payload, "error": None}
-    except:
-        raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR, detail = str(Exception))
+                    with open(os.path.join(os.path.join(data_dir, file)), "r") as f:
+                        nguoi_dung_return["b64"].append(f.read())
+        payload.append(nguoi_dung_return)
+    return {"success": True, "payload": payload, "error": None}

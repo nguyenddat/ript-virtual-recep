@@ -2,8 +2,8 @@ from sqlalchemy import Integer, String, Boolean, ForeignKey
 from sqlalchemy import Column as cl
 from sqlalchemy.orm import relationship
 
-from models.base_class import BareBaseModel, Base
-from models.nhom_tin_chi import NhomTinChi
+from app.models.base_class import BareBaseModel, Base
+from app.models.nhom_tin_chi import NhomTinChi
 
 class LichHoc(BareBaseModel):
     __tablename__ = "lich_hoc"

@@ -7,11 +7,11 @@ from typing import List, AnyStr, Dict, Union
 
 from sqlalchemy import update
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, HTTPException, status, WebSocketException
-from services import ConnectionManager, ImageManager, ModelManager, ExtractCCCD
-from db.base import get_db
-from models.sinh_vien import SinhVien
-from models.can_bo import CanBo
-from models.khach import Khach
+from app.services import ConnectionManager, ImageManager, ModelManager, ExtractCCCD
+from app.db.base import get_db
+from app.models.sinh_vien import SinhVien
+from app.models.can_bo import CanBo
+from app.models.khach import Khach
 
 router = APIRouter()
 connection_manager = ConnectionManager.ConnectionManager()
@@ -112,9 +112,10 @@ async def post_personal_img(data: Dict[AnyStr, List[AnyStr] | Dict[AnyStr, AnySt
     personal_data = data['cccd']
     role =  data['role']
     personal_id = personal_data['Identity Code']
-    personal_data.update({'role': role})    
-    personal_data.update({"department_code": data["department_code"]})
-    personal_data.update({"personal_code": data["personal_code"]})
+    personal_data.update({'role': role})
+    if role != "guest":
+        personal_data.update({"department_code": data["department_code"]})
+        personal_data.update({"personal_code": data["personal_code"]})
 
     save_img_path = os.path.join(os.getcwd(), "app", "data", f"{personal_id}")
     if os.path.exists(save_img_path):

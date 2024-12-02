@@ -3,7 +3,7 @@ import enum
 from fastapi import Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from schemas.base import ResponseSchemaBase
+from app.schemas.base import ResponseSchemaBase
 
 
 class ExceptionType(enum.Enum):

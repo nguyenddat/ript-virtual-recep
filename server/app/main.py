@@ -9,14 +9,14 @@ from contextlib import asynccontextmanager
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
-from api import api_faceRecognition, api_login
-from api import api_weeklySchedule, api_classSchedule, api_appointmentManager
-from api import api_accessData
-from models.base_class import Base
-from db.base import engine
-from core.config import settings
-from helper.exception_handler import CustomException, http_exception_handler
-from helper.update_expired import update_expired_status         
+from app.api import api_faceRecognition, api_login
+from app.api import api_weeklySchedule, api_classSchedule, api_appointmentManager
+from app.api import api_accessData
+from app.models.base_class import Base
+from app.db.base import engine
+from app.core.config import settings
+from app.helper.exception_handler import CustomException, http_exception_handler
+from app.helper.update_expired import update_expired_status         
 
 logging.config.fileConfig(settings.LOGGING_CONFIG_FILE, disable_existing_loggers=False)
 

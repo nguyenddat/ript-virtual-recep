@@ -12,14 +12,14 @@ from collections import Counter
 from sqlalchemy import or_, literal
 from insightface.app import FaceAnalysis
 
-from core.security import get_password_hash
-from db.base import get_db
-from models.sinh_vien import SinhVien
-from models.can_bo import CanBo
-from models.khach import Khach
-from models.nguoi_dung import NguoiDung
-from models.lop_hanh_chinh import LopHanhChinh
-from models.phong_ban import PhongBan
+from app.core.security import get_password_hash
+from app.db.base import get_db
+from app.models.sinh_vien import SinhVien
+from app.models.can_bo import CanBo
+from app.models.khach import Khach
+from app.models.nguoi_dung import NguoiDung
+from app.models.lop_hanh_chinh import LopHanhChinh
+from app.models.phong_ban import PhongBan
 
 def cosine_similarity(a: np.array, b: np.array):
     norm_a, norm_b = norm(a), norm(b)
@@ -219,25 +219,26 @@ class ModelManager:
         role = personal_data["role"]
         with next(get_db()) as db:
             if role == "student":
+                lop_hanh_chinh = db.query(LopHanhChinh).filter(LopHanhChinh.id == personal_data["department_code"]).first()
+                if not lop_hanh_chinh:
+                    raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Không tìm thấy mã lớp hành chính: {personal_data['department_code']}")
                 sinh_vien = db.query(SinhVien).filter(SinhVien.cccd_id == class_dir).first()
                 if sinh_vien:
                     sinh_vien.ho_ten = personal_data["Name"]
                     sinh_vien.ngay_sinh = personal_data["DOB"]
                     sinh_vien.gioi_tinh = personal_data["Gender"]
+                    sinh_vien.id_lop_hanh_chinh = lop_hanh_chinh.id
                     sinh_vien.data = True
                     db.commit()
                     print(f"Cập nhật thông tin cho sinh viên có sẵn: {personal_data['Identity Code']}")
                     db.refresh(sinh_vien)
                 else:
-                    lop_hanh_chinh = db.query(LopHanhChinh).filter(LopHanhChinh.id == personal_data["department_code"]).first()
-                    if not lop_hanh_chinh:
-                        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Không tìm thấy mã lớp hành chính: {personal_data['department_code']}")
                     sinh_vien_moi = SinhVien(
                         ma_sinh_vien = personal_data["personal_code"],
                         ho_ten = personal_data["Name"],
                         gioi_tinh = personal_data["Gender"],
                         ngay_sinh = personal_data["DOB"],
-                        id_lop_hanh_chinh = personal_data["department_code"],
+                        id_lop_hanh_chinh = lop_hanh_chinh.id,
                         cccd_id = personal_data["Identity Code"],
                         data = True
                     )
@@ -255,22 +256,24 @@ class ModelManager:
                     db.refresh(sinh_vien_moi)
                     db.refresh(nguoi_dung_moi)
             elif role == "officer":
+                phong_ban = db.query(PhongBan).filter(PhongBan.id == personal_data["department_code"]).first()
+                if not phong_ban:
+                    raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Không tìm thấy mã phòng ban: {personal_data['department_code']}")
                 can_bo = db.query(CanBo).filter(CanBo.cccd_id == class_dir).first()
                 if can_bo:
                     can_bo.ho_ten = personal_data["Name"]
                     can_bo.ngay_sinh = personal_data["DOB"]
                     can_bo.gioi_tinh = personal_data["Gender"]
+                    can_bo.phong_ban_id = phong_ban.id
                     can_bo.data = True
                     db.commit()
                     print(f"Cập nhật thông tin cho cán bộ có sẵn: {personal_data['Identity Code']}")
                     db.refresh(can_bo)
                 else:
-                    phong_ban = db.query(PhongBan).filter(PhongBan.id == personal_data["department_code"]).first()
-                    if not phong_ban:
-                        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Không tìm thấy mã phòng ban: {personal_data['department_code']}")
                     can_bo_moi = CanBo(
                         ma_can_bo = personal_data["personal_code"],
                         ho_ten = personal_data["Name"],
+                        phong_ban_id = phong_ban.id,
                         cccd_id = personal_data["Identity Code"],
                         gioi_tinh = personal_data["Gender"],
                         ngay_sinh = personal_data["DOB"],

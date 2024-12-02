@@ -16,11 +16,3 @@ RUN pip install uvicorn[standard]
 EXPOSE 8000
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-
-
-# RUN apt-get update && apt-get -y dist-upgrade
-# RUN apt-get update && apt-get install -y python3-dev
-# COPY ./prestart.sh /server/
-# RUN pip install -r /server/requirements.txt
-# RUN ["chmod", "+x", "/server/prestart.sh"]
-# ENTRYPOINT ["/server/prestart.sh"]
