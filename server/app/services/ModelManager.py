@@ -222,12 +222,13 @@ class ModelManager:
                 lop_hanh_chinh = db.query(LopHanhChinh).filter(LopHanhChinh.id == personal_data["department_code"]).first()
                 if not lop_hanh_chinh:
                     raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Không tìm thấy mã lớp hành chính: {personal_data['department_code']}")
-                sinh_vien = db.query(SinhVien).filter(SinhVien.cccd_id == class_dir).first()
+                sinh_vien = db.query(SinhVien).filter(SinhVien.ma_sinh_vien == personal_data["personal_code"]).first()
                 if sinh_vien:
                     sinh_vien.ho_ten = personal_data["Name"]
                     sinh_vien.ngay_sinh = personal_data["DOB"]
                     sinh_vien.gioi_tinh = personal_data["Gender"]
                     sinh_vien.id_lop_hanh_chinh = lop_hanh_chinh.id
+                    sinh_vien.cccd_id = personal_data["Identity Code"]
                     sinh_vien.data = True
                     db.commit()
                     print(f"Cập nhật thông tin cho sinh viên có sẵn: {personal_data['Identity Code']}")
@@ -259,11 +260,12 @@ class ModelManager:
                 phong_ban = db.query(PhongBan).filter(PhongBan.id == personal_data["department_code"]).first()
                 if not phong_ban:
                     raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Không tìm thấy mã phòng ban: {personal_data['department_code']}")
-                can_bo = db.query(CanBo).filter(CanBo.cccd_id == class_dir).first()
+                can_bo = db.query(CanBo).filter(CanBo.ma_can_bo == personal_data["personal_code"]).first()
                 if can_bo:
                     can_bo.ho_ten = personal_data["Name"]
                     can_bo.ngay_sinh = personal_data["DOB"]
                     can_bo.gioi_tinh = personal_data["Gender"]
+                    can_bo.cccd_id = personal_data["Identity Code"]
                     can_bo.phong_ban_id = phong_ban.id
                     can_bo.data = True
                     db.commit()
