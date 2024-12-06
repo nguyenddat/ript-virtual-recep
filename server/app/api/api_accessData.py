@@ -114,7 +114,7 @@ def get_identityData(data: bool = True,
                     dst_path = os.path.join(user_static_dir, file)
                     shutil.copy2(src_path, dst_path)
 
-                    static_url_path = f"/static/identity/{infor.cccd_id}/file"
+                    static_url_path = f"/static/identity/{infor.cccd_id}/{file}"
                     nguoi_dung_return["img"].append(static_url_path)
 
         payload.append(nguoi_dung_return)
