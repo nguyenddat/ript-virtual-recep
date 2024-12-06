@@ -47,16 +47,16 @@ def get_application() -> FastAPI:
         description='Base FastAPI'
     )
     
-    current_dir = Path(__file__).resolve().parent
-    static_dir = current_dir / "static"
+    # current_dir = Path(__file__).resolve().parent
+    # static_dir = current_dir / "static"
     
-    if not static_dir.is_dir():
-        static_dir.mkdir(parents=True, exist_ok=True)
-        logging.info(f"Đã tạo thư mục static tại: {static_dir}")
-    else:
-        logging.info(f"Thư mục static đã tồn tại tại: {static_dir}")
+    # if not static_dir.is_dir():
+    #     static_dir.mkdir(parents=True, exist_ok=True)
+    #     logging.info(f"Đã tạo thư mục static tại: {static_dir}")
+    # else:
+    #     logging.info(f"Thư mục static đã tồn tại tại: {static_dir}")
     
-    application.mount("/static", StaticFiles(directory=static_dir), name="static")
+    # application.mount("/static", StaticFiles(directory=static_dir), name="static")
     application.add_middleware(
         CORSMiddleware,
         allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
@@ -74,6 +74,7 @@ def get_application() -> FastAPI:
 
     application.add_exception_handler(CustomException, http_exception_handler)
 
+    application.mount("/static", StaticFiles(directory = "app/static"), name = "static")
     return application
 
 
