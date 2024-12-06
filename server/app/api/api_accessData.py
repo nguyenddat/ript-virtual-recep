@@ -14,6 +14,8 @@ from app.models.nguoi_dung import NguoiDung
 from app.models.lop_hanh_chinh import LopHanhChinh
 
 router = APIRouter()
+STATIC_DIR = os.path.join(os.getcwd(), "app", "static", "data")
+os.makedirs(STATIC_DIR, exist_ok = True)
 
 @router.get("/api/administrative-class/get")
 def get_administrative_class(db = Depends(get_db)):
@@ -99,13 +101,19 @@ def get_identityData(data: bool = True,
             "role": nguoi_dung.vai_tro,
             "dob": infor.ngay_sinh,
             "gender": infor.gioi_tinh,
-            "b64": []
+            "img": []
         }
         if data:
             data_dir = os.path.join(os.getcwd(), "app", "data", infor.cccd_id)
+            user_static_dir = os.path.join(STATIC_DIR, infor.cccd_id)
             for file in os.listdir(data_dir):
-                if file.endswith("base64.txt"):
-                    with open(os.path.join(os.path.join(data_dir, file)), "r") as f:
-                        nguoi_dung_return["b64"].append(f.read())
+                if file.endswith(".png"):
+                    src_path = os.path.join(data_dir, file)
+                    dst_path = os.path.join(user_static_dir, file)
+                    shutil.copy2(src_path, dst_path)
+
+                    static_url_path = f"/static/identity/{infor.cccd_id}/file"
+                    nguoi_dung_return["img"].append(static_url_path)
+
         payload.append(nguoi_dung_return)
     return {"success": True, "payload": payload, "error": None}

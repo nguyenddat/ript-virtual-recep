@@ -72,6 +72,8 @@ def get_application() -> FastAPI:
     application.include_router(api_weeklySchedule.router, tags = ["weeklySchedule"])
 
     application.add_exception_handler(CustomException, http_exception_handler)
+
+    application.mount("/static", StaticFiles(directory = "app/static"), name = "static")
     return application
 
 
