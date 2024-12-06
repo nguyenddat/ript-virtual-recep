@@ -74,7 +74,6 @@ def get_application() -> FastAPI:
 
     application.add_exception_handler(CustomException, http_exception_handler)
 
-    application.mount("/static", StaticFiles(directory = "static"), name = "static")
     return application
 
 
