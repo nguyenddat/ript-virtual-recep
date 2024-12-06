@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+from fastapi.staticfiles import StaticFiles
 
 from app.api import api_faceRecognition, api_login
 from app.api import api_weeklySchedule, api_classSchedule, api_appointmentManager

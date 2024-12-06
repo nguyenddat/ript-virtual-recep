@@ -1,4 +1,5 @@
 import os
+import shutil
 
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy import literal, func
