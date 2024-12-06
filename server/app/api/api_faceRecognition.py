@@ -118,18 +118,21 @@ async def post_personal_img(data: Dict[AnyStr, List[AnyStr] | Dict[AnyStr, AnySt
         personal_data.update({"personal_code": data["personal_code"]})
 
     save_img_path = os.path.join(os.getcwd(), "app", "data", f"{personal_id}")
+    static_dir = os.path.join(os.getcwd(), "app", "static", "data", f"{personal_id}")
     if os.path.exists(save_img_path):
         shutil.rmtree(save_img_path)
         model_manager.delete_data(personal_id)
 
+    if os.path.exists(static_dir):
+        shutil.rmtree(static_dir)
+
     os.makedirs(save_img_path)
+    os.makedirs(static_dir)
     id = 0 
     for img in b64_img:
         img_path = os.path.join(save_img_path, f'{personal_id}_{id}.png')
         image_manager.save_img_from_base64(img, img_path)
-        if not os.path.exists(os.path.join(os.getcwd(), "app", "static", "data", f"{personal_id}")):
-            os.mkdir(os.path.join(os.getcwd(), "app", "static", "data", f"{personal_id}"))
-        image_manager.save_img_from_base64(img, os.path.join(os.getcwd(), "app", "static", "data", f"{personal_id}", f'{personal_id}_{id}.png'))
+        image_manager.save_img_from_base64(img, os.path.join(static_dir, f'{personal_id}_{id}.png'))
         print(f"Lưu thành công ảnh: {personal_id}_{id}.png")
         with open(os.path.join(save_img_path, f'{personal_id}_{id}_base64.txt'), 'w') as file:
             file.write(img)
