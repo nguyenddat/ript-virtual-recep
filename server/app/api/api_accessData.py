@@ -105,15 +105,10 @@ def get_identityData(data: bool = True,
             "img": []
         }
         if data:
-            data_dir = os.path.join(os.getcwd(), "app", "data", infor.cccd_id)
             user_static_dir = os.path.join(STATIC_DIR, infor.cccd_id)
             os.makedirs(user_static_dir, exist_ok = True)
-            for file in os.listdir(data_dir):
+            for file in os.listdir(user_static_dir):
                 if file.endswith(".png"):
-                    src_path = os.path.join(data_dir, file)
-                    dst_path = os.path.join(user_static_dir, file)
-                    shutil.copy2(src_path, dst_path)
-
                     static_url_path = f"/static/data/{infor.cccd_id}/{file}"
                     nguoi_dung_return["img"].append(static_url_path)
 
