@@ -107,6 +107,7 @@ def get_identityData(data: bool = True,
         if data:
             data_dir = os.path.join(os.getcwd(), "app", "data", infor.cccd_id)
             user_static_dir = os.path.join(STATIC_DIR, infor.cccd_id)
+            os.makedirs(user_static_dir, exist_ok = True)
             for file in os.listdir(data_dir):
                 if file.endswith(".png"):
                     src_path = os.path.join(data_dir, file)
