@@ -6,6 +6,7 @@ from sqlalchemy import literal, func
 from sqlalchemy.orm import Session
 from typing import Optional
 
+from app.helper.login_manager import PermissionRequired, login_required 
 from app.db.base import get_db
 from app.models.phong_ban import PhongBan
 from app.models.can_bo import CanBo
@@ -82,10 +83,12 @@ def get_officer_by_departments(phong_ban_id: Optional[int] = None, db = Depends(
         raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR, detail = Exception)
         
 @router.get("/api/identity-data/get")
-def get_identityData(data: bool = True,
-                     role: Optional[str] = None,
-                     department_code: Optional[int] = None,
-                     db: Session = Depends(get_db)):
+def get_identityData(current_user = Depends(login_required),
+                        permission: PermissionRequired = Depends(PermissionRequired("admin")),
+                        data: bool = True,
+                        role: Optional[str] = None,
+                        department_code: Optional[int] = None,
+                        db: Session = Depends(get_db)):
     payload = []
     roles = {"student": SinhVien, "officer": CanBo, "guest": Khach}
     base_query = db.query(NguoiDung)
