@@ -38,7 +38,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     return db_user
 
 @router.post("/api/auth/login")
-async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+async def login(form_data: LoginRequest, db: Session = Depends(get_db)):
     user = UserService().authenticate(username=form_data.cccd_id, password=form_data.password)
 
     if not user:
