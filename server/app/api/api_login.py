@@ -45,7 +45,7 @@ async def login(form_data: LoginRequest, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"}, # Frontend will send API with Header like `'Authorization': `Bearer ${token}`
+            headers={"WWW-Authenticate": "Bearer"}
         )
         user.lan_cuoi_hoat_dong = datetime.now()
         db.commit()
