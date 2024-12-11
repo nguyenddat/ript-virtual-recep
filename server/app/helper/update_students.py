@@ -65,7 +65,7 @@ def create_new_student(lop_hanh_chinh, personal_data):
         db.refresh(nguoi_dung_moi)
 
 def update_student(personal_data):
-    with next(get_db) as db:
+    with next(get_db()) as db:
         lop_hanh_chinh = db.query(LopHanhChinh).filter(
             LopHanhChinh.id == personal_data["department_code"]
         ).first()
