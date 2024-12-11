@@ -161,7 +161,7 @@ async def post_personal_img(data: IdentityDataUpdateRequest):
         # Cập nhật dữ liệu mô hình
         model_manager.update_data(save_img_path, image_manager, personal_data)
 
-        return ResponseSchemaBase.success_response()
+        return ResponseSchemaBase().success_response()
 
     except Exception as e:
         # Xóa dữ liệu nếu cập nhật lỗi
@@ -173,5 +173,5 @@ async def post_personal_img(data: IdentityDataUpdateRequest):
         # Xử lý ngoại lệ chung
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Lỗi xử lý: {str(e.detail)}"
+            detail=f"Lỗi xử lý: {str(e)}"
         )
