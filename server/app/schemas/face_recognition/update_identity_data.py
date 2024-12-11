@@ -33,7 +33,7 @@ class IdentityDataUpdateRequest(BaseModel):
         """
         Validate that role is one of the allowed values
         """
-        allowed_roles = ['admin', 'student', 'guest', 'officer']
+        allowed_roles = ['admin', 'user', 'guest', 'officer']
         if role not in allowed_roles:
             raise ValueError(f"Invalid role. Must be one of {allowed_roles}")
         return role

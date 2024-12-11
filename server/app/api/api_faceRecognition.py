@@ -100,7 +100,7 @@ async def get_identity(data: List[AnyStr]):
                 db.commit()
                 db.refresh(search)
 
-@router.post('/api/identity-data/update', response_model = ResponseSchemaBase)
+@router.post('/api/identity-data/update')
 async def post_personal_img(data: IdentityDataUpdateRequest):
     # Kiểm tra dữ liệu đầu vào
     if not data:
