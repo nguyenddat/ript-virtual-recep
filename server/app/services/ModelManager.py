@@ -226,13 +226,9 @@ class ModelManager:
         self.KNN.delete_data(cccd_id)
         with next(get_db()) as db:
             nguoi_dung = db.query(NguoiDung).filter(NguoiDung.cccd_id == cccd_id).first()
-            if nguoi_dung.vai_tro == "officer":
-                base_role = CanBo
-            elif nguoi_dung.vai_tro == "student":
-                base_role = SinhVien
-            else:
-                base_role = Khach
-            
+            if not nguoi_dung:
+                return
+            base_role = roles[nguoi_dung.vai_tro]            
             check = db.query(base_role).filter(base_role.cccd_id == cccd_id).first()
             if not check:
                 raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Không tìm thấy cá nhân: {cccd_id}")
