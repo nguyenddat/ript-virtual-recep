@@ -1,5 +1,5 @@
+from fastapi import status
 from typing import Optional, TypeVar, Generic, Dict
-
 from pydantic import BaseModel, Field
 
 class BaseResponseSchema(BaseModel):
