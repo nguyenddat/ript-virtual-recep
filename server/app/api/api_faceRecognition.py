@@ -164,6 +164,12 @@ async def post_personal_img(data: Dict[AnyStr, List[AnyStr] | Dict[AnyStr, AnySt
         return {"success": True}
 
     except Exception as e:
+        # Xóa dữ liệu cũ nếu đã tồn tại
+        for path in [save_img_path, static_dir]:
+            if os.path.exists(path):
+                shutil.rmtree(path)        
+        model_manager.delete_data(personal_id)
+
         # Xử lý ngoại lệ chung
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
