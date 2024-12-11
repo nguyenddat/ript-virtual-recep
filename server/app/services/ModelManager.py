@@ -88,7 +88,7 @@ class KNN:
         self.add_data({"X": data, "y": cccd_id})
 
     def save_data(self):
-        print(f"THỰC HIỆN LƯU DỮ LIỆU: {self.data}")
+        print(f"THỰC HIỆN LƯU DỮ LIỆU")
         with open(self.save_model_path, "wb") as file:
             pickle.dump(self.data, file)
     
@@ -219,6 +219,7 @@ class ModelManager:
                 else:
                     update_guest(personal_data)
             except HTTPException as e:
+                print(f"Lỗi cập nhật dữ liệu: {e.detail}")
                 raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR, detail = f"Lỗi cập nhật dữ liệu: {e.detail}") 
                              
     def delete_data(self, cccd_id):
