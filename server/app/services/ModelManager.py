@@ -25,7 +25,7 @@ from app.models.phong_ban import PhongBan
 
 from app.helper.update_students import update_student
 from app.helper.update_officers import update_officer
-from app.helper.guests import update_guest
+from app.helper.update_guests import update_guest
 
 roles = {"student": SinhVien, "officer": CanBo, "guest": Khach}
 def cosine_similarity(a: np.array, b: np.array):
