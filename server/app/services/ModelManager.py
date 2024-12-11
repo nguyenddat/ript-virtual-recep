@@ -24,7 +24,7 @@ from app.models.lop_hanh_chinh import LopHanhChinh
 from app.models.phong_ban import PhongBan
 
 from app.helper.update_students import update_student
-from app.helper.update_officers import update_officers
+from app.helper.update_officers import update_officer
 from app.helper.guests import update_guest
 
 roles = {"student": SinhVien, "officer": CanBo, "guest": Khach}
