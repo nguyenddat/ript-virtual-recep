@@ -125,8 +125,8 @@ async def post_personal_img(data: IdentityDataUpdateRequest):
     # Cập nhật thêm thông tin vai trò và phòng ban
     personal_data['role'] = role
     if role != "guest":
-        personal_data['department_code'] = data.get("department_code", "")
-        personal_data['personal_code'] = data.get("personal_code", "")
+        personal_data['department_code'] = data.department_code
+        personal_data['personal_code'] = data.personal_code
     
     # Xác định đường dẫn lưu trữ
     save_img_path = os.path.join(os.getcwd(), "app", "data", f"{personal_id}")
