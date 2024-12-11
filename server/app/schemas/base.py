@@ -19,6 +19,7 @@ class ResponseSchemaBase(BaseModel):
     def success_response(self):
         self.code = '200'
         self.message = 'Success'
+        self.success = True
         return self.dict()
 
 
