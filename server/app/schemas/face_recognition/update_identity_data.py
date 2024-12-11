@@ -20,7 +20,7 @@ class IdentityDataUpdateRequest(BaseModel):
         min_length=1
     )
     
-    department_code: Optional[str] = Field(
+    department_code: Optional[int] = Field(
         default=None
     )
     
