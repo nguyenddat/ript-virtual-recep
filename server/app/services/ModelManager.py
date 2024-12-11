@@ -182,7 +182,20 @@ class ModelManager:
                     pickle.dump(data, file)
                 return data
                              
-    def update_data(self, data_dir, imageManager, personal_data):
+    def update_data(self, data_dir, imageManager, personal_data):            
+        # Database operations based on user role
+        with next(get_db()) as db:
+            try:
+                if personal_data["role"] == "student":
+                    update_student(personal_data)
+                elif personal_data["role"] == "officer":
+                    update_officer(personal_data)
+                else:
+                    update_guest(personal_data)
+            except HTTPException as e:
+                print(f"Lỗi cập nhật dữ liệu: {e.detail}")
+                raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR, detail = f"Lỗi cập nhật dữ liệu: {e.detail}") 
+
         # Prepare basic data structure
         class_dir = data_dir.replace("\\", "/").rstrip("/").split("/")[-1]
         data = {"y": class_dir, "X": []}
@@ -201,26 +214,13 @@ class ModelManager:
             except Exception as err:
                 print(f"Lỗi xử lý ảnh")
         
-        # Update KNN data
-        self.KNN.update_data(class_dir, data)
-        self.KNN.save_data()
-        
         # Backup data
         with open(os.path.join(data_dir, "backup.pkl"), "wb") as file:
             pickle.dump(data, file)
-            
-        # Database operations based on user role
-        with next(get_db()) as db:
-            try:
-                if personal_data["role"] == "student":
-                    update_student(personal_data)
-                elif personal_data["role"] == "officer":
-                    update_officer(personal_data)
-                else:
-                    update_guest(personal_data)
-            except HTTPException as e:
-                print(f"Lỗi cập nhật dữ liệu: {e.detail}")
-                raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR, detail = f"Lỗi cập nhật dữ liệu: {e.detail}") 
+
+        # Update KNN data
+        self.KNN.update_data(class_dir, data)
+        self.KNN.save_data()
                              
     def delete_data(self, cccd_id):
         self.KNN.delete_data(cccd_id)

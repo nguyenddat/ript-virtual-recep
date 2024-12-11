@@ -102,40 +102,70 @@ async def get_identity(data: List[AnyStr]):
 
 @router.post('/api/identity-data/update')
 async def post_personal_img(data: Dict[AnyStr, List[AnyStr] | Dict[AnyStr, AnyStr] | AnyStr]):
+    # Kiểm tra dữ liệu đầu vào
     if not data:
         raise HTTPException(
-            status_code = status.HTTP_400_BAD_REQUEST,
-            detail = "Không có dữ liệu"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Không có dữ liệu"
         )
 
-    b64_img = data['b64_img']
-    personal_data = data['cccd']
-    role =  data['role']
-    personal_id = personal_data['Identity Code']
-    personal_data.update({'role': role})
-    if role != "guest":
-        personal_data.update({"department_code": data["department_code"]})
-        personal_data.update({"personal_code": data["personal_code"]})
+    # Trích xuất dữ liệu từ request
+    b64_img = data.get('b64_img', [])
+    personal_data = data.get('cccd', {})
+    role = data.get('role', '')
+    personal_id = personal_data.get('Identity Code', '')
 
+    # Kiểm tra tính hợp lệ của dữ liệu
+    if not personal_id or not role:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Thiếu thông tin định danh"
+        )
+
+    # Cập nhật thêm thông tin vai trò và phòng ban
+    personal_data['role'] = role
+    if role != "guest":
+        personal_data['department_code'] = data.get("department_code", "")
+        personal_data['personal_code'] = data.get("personal_code", "")
+    
+    # Xác định đường dẫn lưu trữ
     save_img_path = os.path.join(os.getcwd(), "app", "data", f"{personal_id}")
     static_dir = os.path.join(os.getcwd(), "app", "static", "data", f"{personal_id}")
-    if os.path.exists(save_img_path):
-        shutil.rmtree(save_img_path)
-        model_manager.delete_data(personal_id)
 
-    if os.path.exists(static_dir):
-        shutil.rmtree(static_dir)
+    # Xác định đường dẫn lưu trữ
+    save_img_path = os.path.join(os.getcwd(), "app", "data", f"{personal_id}")
+    static_dir = os.path.join(os.getcwd(), "app", "static", "data", f"{personal_id}")
 
-    os.makedirs(save_img_path)
-    os.makedirs(static_dir)
-    id = 0 
-    for img in b64_img:
-        img_path = os.path.join(save_img_path, f'{personal_id}_{id}.png')
-        image_manager.save_img_from_base64(img, img_path)
-        image_manager.save_img_from_base64(img, os.path.join(static_dir, f'{personal_id}_{id}.png'))
-        print(f"Lưu thành công ảnh: {personal_id}_{id}.png")
-        with open(os.path.join(save_img_path, f'{personal_id}_{id}_base64.txt'), 'w') as file:
-            file.write(img)
-        id += 1
-    model_manager.update_data(save_img_path, image_manager, personal_data)
-    return {"success": True}
+    # Xóa dữ liệu cũ nếu đã tồn tại
+    for path in [save_img_path, static_dir]:
+        if os.path.exists(path):
+            shutil.rmtree(path)        
+    model_manager.delete_data(personal_id)
+    
+    try:
+        # Tạo thư mục mới
+        os.makedirs(save_img_path)
+        os.makedirs(static_dir)
+
+        # Lưu ảnh
+        for id, img in enumerate(b64_img):
+            # Đường dẫn lưu ảnh
+            img_path = os.path.join(save_img_path, f'{personal_id}_{id}.png')
+            static_img_path = os.path.join(static_dir, f'{personal_id}_{id}.png')
+            
+            # Lưu ảnh
+            image_manager.save_img_from_base64(img, img_path)
+            image_manager.save_img_from_base64(img, static_img_path)            
+            print(f"Lưu thành công ảnh: {personal_id}_{id}.png")
+
+        # Cập nhật dữ liệu mô hình
+        model_manager.update_data(save_img_path, image_manager, personal_data)
+
+        return {"success": True}
+
+    except Exception as e:
+        # Xử lý ngoại lệ chung
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Lỗi xử lý: {str(e.detail)}"
+        )
