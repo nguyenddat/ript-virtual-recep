@@ -14,12 +14,12 @@ class ResponseSchemaBase(BaseModel):
     def custom_response(self, code: str, message: str):
         self.code = code
         self.message = message
-        return self
+        return self.dict()
 
     def success_response(self):
         self.code = '200'
         self.message = 'Success'
-        return self
+        return self.dict()
 
 
 class DataResponse(ResponseSchemaBase, BaseModel, Generic[T]):
