@@ -17,6 +17,7 @@ from app.models.can_bo import CanBo
 from app.models.khach import Khach
 
 from app.schemas.face_recognition.update_identity_data import *
+from app.schemas.base import ResponseSchemaBase
 
 router = APIRouter()
 connection_manager = ConnectionManager.ConnectionManager()
@@ -60,10 +61,6 @@ async def websocket_endpoint(websocket: WebSocket):
         connection_manager.disconnect(websocket)
         raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR, detail=Exception)
 
-@router.post("/test")
-def test(data: Dict[str, Union[List[AnyStr], AnyStr]]):
-    logger.info(data)
-
 @router.post("/api/get-identity")
 async def get_identity(data: List[AnyStr]):
     global decoded_data
@@ -103,9 +100,7 @@ async def get_identity(data: List[AnyStr]):
                 db.commit()
                 db.refresh(search)
 
-@router.post('/api/identity-data/update', 
-             response_model = IdentityDataUpdateSuccessResponse,
-             responses = {400: {"model": ErrorResponseSchema}})
+@router.post('/api/identity-data/update', response_model = ResponseSchemaBase)
 async def post_personal_img(data: IdentityDataUpdateRequest):
     # Kiểm tra dữ liệu đầu vào
     if not data:
@@ -166,7 +161,7 @@ async def post_personal_img(data: IdentityDataUpdateRequest):
         # Cập nhật dữ liệu mô hình
         model_manager.update_data(save_img_path, image_manager, personal_data)
 
-        return {"success": True}
+        return ResponseSchemaBase.success_response()
 
     except Exception as e:
         # Xóa dữ liệu nếu cập nhật lỗi

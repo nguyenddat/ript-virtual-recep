@@ -4,24 +4,6 @@ from fastapi import status
 
 from app.schemas.base import BaseResponseSchema
 
-# Specific Success Response
-class IdentityDataUpdateSuccessResponse(BaseResponseSchema):
-    """
-    Success response for identity data update
-    """
-    success: bool = Field(default=True)
-    status_code: int = Field(default=status.HTTP_200_OK)
-    message: Optional[str] = Field(default="Cập nhật dữ liệu thành công")
-
-# Error Response Schema
-class ErrorResponseSchema(BaseResponseSchema):
-    """
-    Standard error response schema
-    """
-    success: bool = Field(default=False)
-    status_code: int = Field(default=status.HTTP_400_BAD_REQUEST)
-    message: str = Field(description="Cập nhật dữ liệu không thành công")
-
 # Request Schema
 class IdentityDataUpdateRequest(BaseModel):
     """
