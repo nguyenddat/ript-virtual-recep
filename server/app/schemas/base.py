@@ -1,6 +1,8 @@
-from fastapi import status
 from typing import Optional, TypeVar, Generic, Dict
-from pydantic import BaseModel, Field
+
+from pydantic import BaseModel
+
+T = TypeVar("T")
 
 class ResponseSchemaBase(BaseModel):
     __abstract__ = True
