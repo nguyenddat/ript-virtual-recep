@@ -13,7 +13,9 @@ from sqlalchemy import or_, literal
 from insightface.app import FaceAnalysis
 
 from app.core.security import get_password_hash
+
 from app.db.base import get_db
+
 from app.models.sinh_vien import SinhVien
 from app.models.can_bo import CanBo
 from app.models.khach import Khach
@@ -21,11 +23,15 @@ from app.models.nguoi_dung import NguoiDung
 from app.models.lop_hanh_chinh import LopHanhChinh
 from app.models.phong_ban import PhongBan
 
+from app.helper.update_students import update_student
+from app.helper.update_officers import update_officers
+from app.helper.guests import update_guest
+
+roles = {"student": SinhVien, "officer": CanBo, "guest": Khach}
 def cosine_similarity(a: np.array, b: np.array):
     norm_a, norm_b = norm(a), norm(b)
     if norm_a == 0 or norm_b == 0:
         return 0
-
     try: 
         cosine_sim = np.dot(a, b) / (norm_a * norm_b)
         return cosine_sim
@@ -41,29 +47,15 @@ def get_info(cccd_id):
             "name": "Khách",
             "role": "guest"
         }
-    ho_ten = None
     with next(get_db()) as db:
         search_first = db.query(NguoiDung).filter(NguoiDung.cccd_id == cccd_id).first()
-        if search_first.vai_tro == "student":
-            sinh_vien = db.query(SinhVien).filter(SinhVien.cccd_id == cccd_id).first()
-            ho_ten = sinh_vien.ho_ten
-        elif search_first.vai_tro == "officer":
-            can_bo = db.query(CanBo).filter(CanBo.cccd_id == cccd_id).first()
-            ho_ten = can_bo.ho_ten
+        if search_first:    
+            base_role = roles[search_first.vai_tro]
+            person = db.query(base_role).filter(base_role.cccd_id == search_first.cccd_id).first()
+            ho_ten = person.ho_ten
+            return {"name": ho_ten, "cccd": cccd_id, "role": search_first.vai_tro}             
         else:
-            khach = db.query(Khach).filter(Khach.cccd_id == cccd_id).first()
-            ho_ten = khach.ho_ten
-    if search_first:
-        return {
-            "name": ho_ten,
-            "cccd": cccd_id,
-            "role": search_first.vai_tro
-        }             
-    else:
-        return {
-            "name": "Khách",
-            "role": "guest"
-        }
+            return {"name": "Khách", "role": "guest"}
 
 class FaceEmbedding:
     def __init__(self, embedding, bbox):
@@ -83,16 +75,16 @@ class KNN:
     def add_data(self, data):
         print(f"THỰC HIỆN THÊM DATA...")
         self.data.append(data)
-        print(f"Thêm data: {len(self.data)}")
+        print(f"------> Đã thêm data: {len(self.data)}")
     
     def update_data(self, cccd_id, data):
         print(f"THỰC HIỆN CẬP NHẬT DỮ LIỆU...")
         for i in range(len(self.data)):
             if self.data[i]["y"] == cccd_id:
                 self.data[i]["X"] = data
-                print(f"Cập nhật dữ liệu: {self.data[i]}")
+                print(f"------> Cập nhật dữ liệu: {self.data[i]}")
                 return
-        print("Thêm dữ liệu...")
+        print("------> Thêm dữ liệu")
         self.add_data({"X": data, "y": cccd_id})
 
     def save_data(self):
@@ -105,7 +97,7 @@ class KNN:
         for i in range(len(self.data)):
             if self.data[i]["y"] == cccd_id:
                 self.data.pop(i)
-                print(f"Xóa dữ liệu: {cccd_id}")
+                print(f"------> Xóa dữ liệu: {cccd_id}")
                 break
     
     def predict(self, img_array):
@@ -114,8 +106,6 @@ class KNN:
             for face in data["X"]:
                 X.append(face)
                 y.append(data["y"])
-        print(X)
-        print(y)
         distances = []
         current_k = min(self.k, len(X))
         for i in range(len(X)):
@@ -141,7 +131,6 @@ class ModelManager:
 
         self.KNN = KNN()
         self.KNN.load_data(self.load_data())
-        print(self.KNN.data)
 
     def embed_face(self, img_array):
         img = cv2.cvtColor(img_array, cv2.COLOR_BGR2RGB)
@@ -172,7 +161,6 @@ class ModelManager:
                     with open(data_dir, "rb") as file:
                         data.append(pickle.load(file))
                 with open(self.KNN.save_model_path, "wb") as file:
-                    print(data)
                     pickle.dump(data, file)
                 return data
             except:
@@ -180,7 +168,7 @@ class ModelManager:
                 data = []
                 for nguoi_dung in cac_sinh_vien + cac_can_bo + cac_khach:
                     X, y = [], nguoi_dung.cccd_id
-                    data_dir = os.path.join(os.getcwd(), "app", "data", y)
+                    data_dir = os.path.join(os.getcwd(), "app", "data", str(y))
                     for file in os.listdir(data_dir):
                         if file.endswith(".png"):
                             img_path = os.path.join(data_dir, file)
@@ -191,139 +179,47 @@ class ModelManager:
                         pickle.dump({"X": X, "y": y}, file)
                     data.append({"X": X, "y": y})
                 with open(self.KNN.save_model_path, "wb") as file:
-                    print(data)
                     pickle.dump(data, file)
                 return data
                              
     def update_data(self, data_dir, imageManager, personal_data):
-        data = {}
+        # Prepare basic data structure
         class_dir = data_dir.replace("\\", "/").rstrip("/").split("/")[-1]
-        data.update({"y": class_dir})
+        data = {"y": class_dir, "X": []}
         
-        X = []
+        # Process and embed face images
         for img in imageManager.image_files_in_folder(data_dir):
-            image = imageManager.load_img_file(img)
-            faces, nums_of_people = self.embed_face(image)
-            if nums_of_people != 1:
-                print(f"Ảnh chứa nhiều khuôn mặt, không phù hợp: {img}")
-                os.remove(img)
-                continue
-            else:
-                X += faces
-        data.update({"X": X})
+            try:
+                image = imageManager.load_img_file(img)
+                faces, nums_of_people = self.embed_face(image)
+                if nums_of_people != 1:
+                    print(f"Ảnh chứa nhiều khuôn mặt, không phù hợp: {img}")
+                    os.remove(img)
+                    continue
+                else:
+                    data["X"].extend(faces)
+            except Exception as err:
+                print(f"Lỗi xử lý ảnh")
+        
+        # Update KNN data
         self.KNN.update_data(class_dir, data)
         self.KNN.save_data()
+        
+        # Backup data
         with open(os.path.join(data_dir, "backup.pkl"), "wb") as file:
             pickle.dump(data, file)
             
-        role = personal_data["role"]
+        # Database operations based on user role
         with next(get_db()) as db:
-            if role == "student":
-                lop_hanh_chinh = db.query(LopHanhChinh).filter(LopHanhChinh.id == personal_data["department_code"]).first()
-                if not lop_hanh_chinh:
-                    raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Không tìm thấy mã lớp hành chính: {personal_data['department_code']}")
-                sinh_vien = db.query(SinhVien).filter(SinhVien.ma_sinh_vien == personal_data["personal_code"]).first()
-                if sinh_vien:
-                    sinh_vien.ho_ten = personal_data["Name"]
-                    sinh_vien.ngay_sinh = personal_data["DOB"]
-                    sinh_vien.gioi_tinh = personal_data["Gender"]
-                    sinh_vien.id_lop_hanh_chinh = lop_hanh_chinh.id
-                    sinh_vien.cccd_id = personal_data["Identity Code"]
-                    sinh_vien.data = True
-                    db.commit()
-                    print(f"Cập nhật thông tin cho sinh viên có sẵn: {personal_data['Identity Code']}")
-                    db.refresh(sinh_vien)
+            try:
+                if personal_data["role"] == "student":
+                    update_student(personal_data)
+                elif personal_data["role"] == "officer":
+                    update_officer(personal_data)
                 else:
-                    sinh_vien_moi = SinhVien(
-                        ma_sinh_vien = personal_data["personal_code"],
-                        ho_ten = personal_data["Name"],
-                        gioi_tinh = personal_data["Gender"],
-                        ngay_sinh = personal_data["DOB"],
-                        id_lop_hanh_chinh = lop_hanh_chinh.id,
-                        cccd_id = personal_data["Identity Code"],
-                        data = True
-                    )
-                    nguoi_dung_moi = NguoiDung(
-                        cccd_id = personal_data["Identity Code"],
-                        hashed_password = get_password_hash(personal_data["Identity Code"]),
-                        vai_tro = "student",
-                        ngay_tao = str(datetime.now())
-                    )
-                    db.add(sinh_vien_moi)
-                    print(f"Tạo sinh viên mới: {personal_data['Identity Code']}")
-                    db.add(nguoi_dung_moi)
-                    print(f"Tạo người dùng mới: {personal_data['Identity Code']}")
-                    db.commit()
-                    db.refresh(sinh_vien_moi)
-                    db.refresh(nguoi_dung_moi)
-            elif role == "officer":
-                phong_ban = db.query(PhongBan).filter(PhongBan.id == personal_data["department_code"]).first()
-                if not phong_ban:
-                    raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Không tìm thấy mã phòng ban: {personal_data['department_code']}")
-                can_bo = db.query(CanBo).filter(CanBo.ma_can_bo == personal_data["personal_code"]).first()
-                if can_bo:
-                    can_bo.ho_ten = personal_data["Name"]
-                    can_bo.ngay_sinh = personal_data["DOB"]
-                    can_bo.gioi_tinh = personal_data["Gender"]
-                    can_bo.cccd_id = personal_data["Identity Code"]
-                    can_bo.phong_ban_id = phong_ban.id
-                    can_bo.data = True
-                    db.commit()
-                    print(f"Cập nhật thông tin cho cán bộ có sẵn: {personal_data['Identity Code']}")
-                    db.refresh(can_bo)
-                else:
-                    can_bo_moi = CanBo(
-                        ma_can_bo = personal_data["personal_code"],
-                        ho_ten = personal_data["Name"],
-                        phong_ban_id = phong_ban.id,
-                        cccd_id = personal_data["Identity Code"],
-                        gioi_tinh = personal_data["Gender"],
-                        ngay_sinh = personal_data["DOB"],
-                        data = True
-                    )
-                    nguoi_dung_moi = NguoiDung(
-                        cccd_id = personal_data["Identity Code"],
-                        hashed_password = get_password_hash(personal_data["Identity Code"]),
-                        vai_tro = "officer",
-                        ngay_tao = str(datetime.now())
-                    )
-                    db.add(can_bo_moi)
-                    print(f"Tạo cán bộ mới: {personal_data['Identity Code']}")
-                    db.add(nguoi_dung_moi)
-                    print(f"Tạo người dùng mới: {personal_data['Identity Code']}")
-                    db.commit()
-                    db.refresh(can_bo_moi)
-                    db.refresh(nguoi_dung_moi)
-            else:
-                khach = db.query(Khach).filter(Khach.cccd_id == class_dir).first()
-                if khach:
-                    khach.ho_ten = personal_data["Name"]
-                    khach.gioi_tinh = personal_data["Gender"]
-                    khach.ngay_sinh = personal_data["DOB"]
-                    khach.data = True
-                    db.commit()
-                    print(f"Cập nhật khách có sẵn: {personal_data['Identity Code']}")
-                else:
-                    khach_moi = Khach(
-                        cccd_id = personal_data["Identity Code"],
-                        ho_ten = personal_data["Name"],
-                        gioi_tinh = personal_data["Gender"],
-                        ngay_sinh = personal_data["DOB"],
-                        data = True
-                    )
-                    nguoi_dung_moi = NguoiDung(
-                        cccd_id = personal_data["Identity Code"],
-                        hashed_password = get_password_hash(personal_data["Identity Code"]),
-                        vai_tro = "guest",
-                        ngay_tao = str(datetime.now())
-                    )                    
-                    db.add(khach_moi)
-                    print(f"Tạo khách mới: {personal_data['Identity Code']}")
-                    db.add(nguoi_dung_moi)
-                    print(f"Tạo người dùng mới: {personal_data['Identity Code']}")
-                    db.commit()
-                    db.refresh(khach_moi)
-                    db.refresh(nguoi_dung_moi)
+                    update_guest(personal_data)
+            except HTTPException as e:
+                raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR, detail = f"Lỗi cập nhật dữ liệu: {e.detail}") 
                              
     def delete_data(self, cccd_id):
         self.KNN.delete_data(cccd_id)
