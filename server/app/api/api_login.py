@@ -61,7 +61,7 @@ async def login(form_data: LoginRequest, db: Session = Depends(get_db)):
     return {
         "success": True,
         "payload": {
-            "accessToken": create_access_token({user_id = user.cccd_id}),
+            "accessToken": create_access_token({user_id: user.cccd_id}),
             "user": {
                 "name": info.ho_ten,
                 "role": user.vai_tro            
