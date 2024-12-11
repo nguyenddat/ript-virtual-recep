@@ -5,6 +5,8 @@ from pydantic import BaseModel
 T = TypeVar("T")
 
 class ResponseSchemaBase(BaseModel):
+    __abstract__ = True
+
     success: bool
     code: str = ''
     message: str = ''
@@ -19,6 +21,7 @@ class ResponseSchemaBase(BaseModel):
         self.message = 'Success'
         self.success = True
         return self
+
 
 class DataResponse(ResponseSchemaBase, BaseModel, Generic[T]):
     data: Optional[T] = None

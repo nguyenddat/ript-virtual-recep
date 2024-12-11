@@ -100,7 +100,7 @@ async def get_identity(data: List[AnyStr]):
                 db.commit()
                 db.refresh(search)
 
-@router.post('/api/identity-data/update')
+@router.post('/api/identity-data/update', response_model = ResponseSchemaBase)
 async def post_personal_img(data: IdentityDataUpdateRequest):
     # Kiểm tra dữ liệu đầu vào
     if not data:
@@ -161,7 +161,7 @@ async def post_personal_img(data: IdentityDataUpdateRequest):
         # Cập nhật dữ liệu mô hình
         model_manager.update_data(save_img_path, image_manager, personal_data)
 
-        return ResponseSchemaBase().success_response()
+        return {"success": True}
 
     except Exception as e:
         # Xóa dữ liệu nếu cập nhật lỗi
