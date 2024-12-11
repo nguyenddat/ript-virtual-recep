@@ -41,12 +41,14 @@ class IdentityDataUpdateRequest(BaseModel):
     @validator('cccd')
     def validate_identity_code(cls, cccd):
         """
-        Validate that Identity Code is present in cccd dictionary
+        Validate that required fields are present in cccd data
         """
-        if 'Identity Code' not in cccd:
-            raise ValueError("Identity Code is required in cccd data")
+        required_fields = ['Identity Code', 'Name', 'DOB', 'Gender']
+        for field in required_fields:
+            if field not in cccd:
+                raise ValueError(f"{field} is required in cccd data")
         return cccd
-    
+
     model_config = ConfigDict(
         extra='ignore',  # Ignore extra fields
         str_strip_whitespace=True  # Automatically strip whitespace
