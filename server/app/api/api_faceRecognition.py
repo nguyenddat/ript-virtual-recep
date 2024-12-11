@@ -7,11 +7,16 @@ from typing import List, AnyStr, Dict, Union
 
 from sqlalchemy import update
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, HTTPException, status, WebSocketException
+
 from app.services import ConnectionManager, ImageManager, ModelManager, ExtractCCCD
+
 from app.db.base import get_db
+
 from app.models.sinh_vien import SinhVien
 from app.models.can_bo import CanBo
 from app.models.khach import Khach
+
+from app.schemas.face_recognition.update_identity_data import *
 
 router = APIRouter()
 connection_manager = ConnectionManager.ConnectionManager()
@@ -60,8 +65,6 @@ def test(data: Dict[str, Union[List[AnyStr], AnyStr]]):
     logger.info(data)
 
 @router.post("/api/get-identity")
-# @router.post("/api/identity-data/post")
-# async def get_identity(data: Dict[AnyStr, Union[List[AnyStr], AnyStr]]):
 async def get_identity(data: List[AnyStr]):
     global decoded_data
     try:
@@ -100,8 +103,10 @@ async def get_identity(data: List[AnyStr]):
                 db.commit()
                 db.refresh(search)
 
-@router.post('/api/identity-data/update')
-async def post_personal_img(data: Dict[AnyStr, List[AnyStr] | Dict[AnyStr, AnyStr] | AnyStr]):
+@router.post('/api/identity-data/update', 
+             response_model = IdentityDataUpdateSuccessResponse,
+             responses = {400: {"model": ErrorResponseSchema}})
+async def post_personal_img(data: IdentityDataUpdateRequest):
     # Kiểm tra dữ liệu đầu vào
     if not data:
         raise HTTPException(
@@ -110,9 +115,9 @@ async def post_personal_img(data: Dict[AnyStr, List[AnyStr] | Dict[AnyStr, AnySt
         )
 
     # Trích xuất dữ liệu từ request
-    b64_img = data.get('b64_img', [])
-    personal_data = data.get('cccd', {})
-    role = data.get('role', '')
+    b64_img = data.b64_img
+    personal_data = data.cccd
+    role = data.role
     personal_id = personal_data.get('Identity Code', '')
 
     # Kiểm tra tính hợp lệ của dữ liệu
@@ -164,7 +169,7 @@ async def post_personal_img(data: Dict[AnyStr, List[AnyStr] | Dict[AnyStr, AnySt
         return {"success": True}
 
     except Exception as e:
-        # Xóa dữ liệu cũ nếu đã tồn tại
+        # Xóa dữ liệu nếu cập nhật lỗi
         for path in [save_img_path, static_dir]:
             if os.path.exists(path):
                 shutil.rmtree(path)        
