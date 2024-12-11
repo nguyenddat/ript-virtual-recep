@@ -2,8 +2,6 @@ from typing import List, Optional, Dict, Union
 from pydantic import BaseModel, Field, ConfigDict, validator
 from fastapi import status
 
-from app.schemas.base import BaseResponseSchema
-
 # Request Schema
 class IdentityDataUpdateRequest(BaseModel):
     """
