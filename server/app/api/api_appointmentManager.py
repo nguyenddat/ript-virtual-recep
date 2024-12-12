@@ -30,13 +30,13 @@ def check_role(role):
     return Khach
 
 @router.get("/api/appointments/stats/by-user")
-def get_appointments_by_user(current_user = Depends(login_required),
-                             permission: PermissionRequired = Depends(PermissionRequired("admin")),
-                             cccd_id: str,
+def get_appointments_by_user(cccd_id: str,
                              role: Optional[str] = None,
                              trang_thai: Optional[str] = None,
                              start_date: Optional[date] = None,
                              end_date: Optional[date] = None,
+                             current_user = Depends(login_required),
+                             permission: PermissionRequired = Depends(PermissionRequired("admin")),
                              db = Depends(get_db)):
     update_expired_status()
     payload = AppointmentManager.get_appointment_by_user(
@@ -50,9 +50,9 @@ def get_appointments_by_user(current_user = Depends(login_required),
             
 @router.post("/api/appointments/create")
 def create_appointments(
+    data: Dict[str, Union[List[str], str]],
     current_user = Depends(login_required),
-    permission: PermissionRequired = Depends(PermissionRequired("admin")),
-    data: Dict[str, Union[List[str], str]]
+    permission: PermissionRequired = Depends(PermissionRequired("admin"))
 ):
     AppointmentManager.post_appointment(data)
     return {"success": True, "error": None}

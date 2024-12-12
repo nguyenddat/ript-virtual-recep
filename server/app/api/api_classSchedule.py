@@ -25,9 +25,9 @@ router = APIRouter()
 class_schedule = ClassSchedule.ClassSchedule()
 
 @router.post("/api/class-calendar/post")
-def post_class_schedule(current_user = Depends(login_required),
-                        permission: PermissionRequired = Depends(PermissionRequired("admin")),
-                        file: UploadFile = File(...)):
+def post_class_schedule(file: UploadFile = File(...),
+                        current_user = Depends(login_required),
+                        permission: PermissionRequired = Depends(PermissionRequired("admin"))):
     if not file:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = "No file found")
         
