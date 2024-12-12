@@ -12,8 +12,8 @@ from reportlab.pdfbase.ttfonts import TTFont
 
 class QRManager(object):
     def __init__(self):
-        self.qr_dir = os.path.join(os.getcwd(), "app", "data", "QRCode")
-        self.pdf_dir = os.path.join(os.getcwd(), "app", "data", "PdfFile")
+        self.qr_dir = os.path.join(os.getcwd(), "app", "static", "qr_codes")
+        self.pdf_dir = os.path.join(os.getcwd(), "app", "static", "pdf_files")
         
     def generate_qr_code(self, data: str, filename: str) -> str:
         if not os.path.exists(self.qr_dir):
