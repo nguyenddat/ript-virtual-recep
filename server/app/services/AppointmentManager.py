@@ -240,8 +240,14 @@ class AppointmentManager(object):
                 can_bo = db.query(CanBo).filter(CanBo.cccd_id == nguoi_dung.cccd_id).first()
                 phong_ban = db.query(PhongBan).filter(PhongBan.id == can_bo.phong_ban_id).first()
                 dem_phong_ban[phong_ban.id] += 1
-        
-        return dem_phong_ban
+
+        payload = [
+            {
+                "department_name": key,
+                "appointments": value
+            } for key, value in dem_phong_ban.items()
+        ]
+        return payload
 
     # + Các lịch hẹn gần đây ( tính trong tuần )
     @staticmethod
