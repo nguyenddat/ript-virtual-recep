@@ -96,13 +96,13 @@ def get_identityData(current_user = Depends(login_required),
                         department_code: Optional[int] = None,
                         db: Session = Depends(get_db)):
     payload = []
-    roles = {"student": SinhVien, "officer": CanBo, "guest": Khach}
+    roles = {"student": [SinhVien, LopHanhChinh], "officer": [CanBo, PhongBan],  "guest": [Khach]}
     base_query = db.query(NguoiDung)
     if role:
         base_query = base_query.filter(NguoiDung.vai_tro == role)
     nguoi_dungs = base_query.filter(NguoiDung.vai_tro != "admin").all()
     for nguoi_dung in nguoi_dungs:
-        base_role = roles[nguoi_dung.vai_tro]
+        base_role = roles[nguoi_dung.vai_tro][0]
         infor = db.query(base_role).filter(base_role.cccd_id == nguoi_dung.cccd_id, base_role.data.is_(data)).first()
         if not infor:
             continue
@@ -113,6 +113,11 @@ def get_identityData(current_user = Depends(login_required),
             "gender": infor.gioi_tinh,
             "img": []
         }
+        if nguoi_dung_return["role"] != "guest":
+            if nguoi_dung_return["role"] == "student":
+                nguoi_dung_return["department_id"] = infor.id_lop_hanh_chinh
+            else:
+                nguoi_dung_return["department_id"] = infor.phong_ban_id
         if data:
             user_static_dir = os.path.join(STATIC_DIR, infor.cccd_id)
             os.makedirs(user_static_dir, exist_ok = True)
