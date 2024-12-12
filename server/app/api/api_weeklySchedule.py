@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from fastapi import APIRouter, UploadFile, File, HTTPException, status
+from fastapi import APIRouter, UploadFile, File, HTTPException, status, Depends
 
 from app.services import WeeklySchedule
 
