@@ -259,6 +259,7 @@ class AppointmentManager(object):
                 cuoc_hen_return = {
                     "start_time": cuoc_hen.ngay_gio_bat_dau,
                     "end_time": cuoc_hen.ngay_gio_ket_thuc,
+                    "purpose": cuoc_hen.muc_dich,
                     "location": cuoc_hen.dia_diem,
                     "status": cuoc_hen.trang_thai
                 }
