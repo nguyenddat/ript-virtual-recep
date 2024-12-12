@@ -33,5 +33,9 @@ def post_lich_tuan(file: UploadFile = File(...),
 
 @router.get("/api/institude-calendar/get")
 def get_lich_tuan():
-    return weekly_schedule.get_events()
+    return {
+        "success": True,
+        "payload": weekly_schedule.get_events(),
+        "error": None
+        }
 
