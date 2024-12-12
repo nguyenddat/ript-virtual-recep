@@ -16,6 +16,6 @@ class PermissionRequired:
 
     def __call__(self, user: NguoiDung = Depends(login_required)):
         self.user = user
-        if self.user.role not in self.permissions and self.permissions:
+        if self.user.vai_tro not in self.permissions and self.permissions:
             raise HTTPException(status_code=400,
-                                detail=f'User {self.user.email} can not access this api')
+                                detail=f'User can not access this api')
