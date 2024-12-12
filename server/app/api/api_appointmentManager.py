@@ -51,8 +51,7 @@ def get_appointments_by_user(cccd_id: str,
 @router.post("/api/appointments/create")
 def create_appointments(
     data: Dict[str, Union[List[str], str]],
-    current_user = Depends(login_required),
-    permission: PermissionRequired = Depends(PermissionRequired("admin"))
+    current_user = Depends(login_required)
 ):
     AppointmentManager.post_appointment(data)
     return {"success": True, "error": None}
