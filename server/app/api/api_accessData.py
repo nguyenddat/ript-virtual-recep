@@ -114,10 +114,19 @@ def get_identityData(current_user = Depends(login_required),
             "img": []
         }
         if nguoi_dung_return["role"] != "guest":
+            table = roles[nguoi_dung.vai_tro][1]
             if nguoi_dung_return["role"] == "student":
-                nguoi_dung_return["department_id"] = infor.id_lop_hanh_chinh
+                lop_hanh_chinh = db.query(table).filter(table.id == infor.id_lop_hanh_chinh).first()
+                nguoi_dung_return["department"] = {
+                    "department_id": lop_hanh_chinh.id,
+                    "department_name": lop_hanh_chinh.ten_lop_hanh_chinh
+                }
             else:
-                nguoi_dung_return["department_id"] = infor.phong_ban_id
+                phong_ban = db.query(table).filter(table.id == infor.phong_ban_id).first()
+                nguoi_dung_return["department"] = {
+                    "department_id": phong_ban.id,
+                    "department_name": phong_ban.ten_phong_ban
+                }
         if data:
             user_static_dir = os.path.join(STATIC_DIR, infor.cccd_id)
             os.makedirs(user_static_dir, exist_ok = True)
