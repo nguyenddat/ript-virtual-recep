@@ -55,20 +55,32 @@ async def login(form_data: LoginRequest, db: Session = Depends(get_db)):
     user.lan_cuoi_hoat_dong = datetime.now()
     db.commit()
 
-    base_role = roles[user.vai_tro]
-    info = db.query(base_role).filter(base_role.cccd_id == user.cccd_id).first()
-    
-    return {
+    if user.vai_tro == "admin":
+        return {
         "success": True,
         "payload": {
             "accessToken": create_access_token({"user_id": user.cccd_id}),
             "user": {
-                "name": info.ho_ten,
-                "role": user.vai_tro            
+                "name": "admin",
+                "role": "admin"            
             },
             "expiresIn": settings.ACCESS_TOKEN_EXPIRE_SECONDS 
         }
     }
+    else:
+        base_role = roles[user.vai_tro]
+        info = db.query(base_role).filter(base_role.cccd_id == user.cccd_id).first()
+        return {
+            "success": True,
+            "payload": {
+                "accessToken": create_access_token({"user_id": user.cccd_id}),
+                "user": {
+                    "name": info.ho_ten,
+                    "role": user.vai_tro            
+                },
+                "expiresIn": settings.ACCESS_TOKEN_EXPIRE_SECONDS 
+            }
+        }
 
 
 @router.get("/users/get-all-users", response_model=UserResponse)
