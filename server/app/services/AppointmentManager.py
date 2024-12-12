@@ -175,30 +175,13 @@ class AppointmentManager(object):
         end_day = today.replace(day = calendar.monthrange(today.year, today.month)[1])
         
         with next(get_db()) as db:
-            cac_cuoc_hen = db.query(CuocHen).all()
-            for cuoc_hen in cac_cuoc_hen:
-                ngay_tao = datetime.datetime.strptime(str(cuoc_hen.ngay_tao), "%Y-%m-%d %H:%M:%S.%f").date()
-                if ngay_tao < start_day or ngay_tao > end_day:
-                    continue
-                cuoc_hen_tra_ve = {
-                    "nguoi_hen": "",
-                    "nguoi_duoc_hen": [],
-                    "ngay_gio_bat_dau": cuoc_hen.ngay_gio_bat_dau,
-                    "ngay_gio_ket_thuc": cuoc_hen.ngay_gio_ket_thuc,
-                    "dia_diem": cuoc_hen.dia_diem,
-                    "trang_thai": cuoc_hen.trang_thai,
-                    "ngay_tao": "T".join(cuoc_hen.ngay_tao.split())
-                }
-                cac_lich_hen = db.query(LichHen).filter(LichHen.lich_hen_id == cuoc_hen.id).all()
-                for lich_hen in cac_lich_hen:
-                    nguoi_dung = db.query(NguoiDung).filter(NguoiDung.cccd_id == lich_hen.cccd_id).first()
-                    thong_tin_nguoi_dung = db.query(roles[nguoi_dung.vai_tro]).filter(roles[nguoi_dung.vai_tro].cccd_id == nguoi_dung.cccd_id).first()
-                    if lich_hen.nguoi_hen is True:
-                        cuoc_hen_tra_ve["nguoi_hen"] = thong_tin_nguoi_dung.ho_ten
-                    else:
-                        cuoc_hen_tra_ve["nguoi_duoc_hen"].append(thong_tin_nguoi_dung.ho_ten)
-                payload.append(cuoc_hen_tra_ve)
-        return payload
+            cac_cuoc_hen = db.query(CuocHen).filter(
+                and_(
+                    func.date(CuocHen.ngay_tao) >= start_day,
+                    func.date(CuocHen.ngay_tao) <= end_day
+                )
+            ).count()
+            return cac_cuoc_hen
 
     @staticmethod
     def get_appointment_all_month():
