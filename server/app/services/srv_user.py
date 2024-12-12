@@ -48,7 +48,7 @@ class UserService(object):
             headers={"WWW-Authenticate": "Bearer"},
         )
         try:
-            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.SECURITY_ALGORITHM])
             username: str = payload.get("sub")
             if username is None:
                 raise credentials_exception
