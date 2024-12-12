@@ -62,28 +62,52 @@ def get_appointments_by_month(
     current_user = Depends(login_required),
     permission: PermissionRequired = Depends(PermissionRequired("admin"))
 ):
-    return AppointmentManager.get_appointment_by_month()
-
+    try:
+        return {
+            "success": True,
+            "payload": AppointmentManager.get_appointment_by_month()
+        }
+    except:
+        raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR, detail = "Lỗi lấy dữ liệu by-month")
+    
 @router.get("/api/appointments/stats/all-month")
 def get_appointments_all_month(
     current_user = Depends(login_required),
     permission: PermissionRequired = Depends(PermissionRequired("admin"))
 ):
-    return AppointmentManager.get_appointment_all_month()
+    try:
+        return {
+            "success": True, 
+            "payload": AppointmentManager.get_appointment_all_month()
+        }
+    except:
+        raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR, detail = "Lỗi lấy dữ liệu all-month")        
 
 @router.get("/api/appointments/stats/by-department")
 def get_appoiments_by_department(
     current_user = Depends(login_required),
     permission: PermissionRequired = Depends(PermissionRequired("admin"))
 ):
-    return AppointmentManager.get_most_appointment_department()
+    try:
+        return {
+            "success": True, 
+            "payload": AppointmentManager.get_most_appointment_department()
+        }
+    except:
+        raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR, detail = "Lỗi lấy dữ liệu by-department")        
 
-@router.get("/api/appointments/stats/by-week")
-def get_appointments_by_week(
+@router.get("/api/appointments/get")
+def get_appointments_all(
     current_user = Depends(login_required),
-    permission: PermissionRequired = Depends(PermissionRequired("admin"))
+    permission: PermissionRequired = Depends(PermissionRequired("admin"))    
 ):
-    return AppointmentManager.get_appointment_by_week()
+    try:
+        return {
+            "success": True, 
+            "payload": AppointmentManager.get_all_appointment()
+        }
+    except:
+        raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR, detail = "Lỗi lấy dữ liệu all")        
 
 @router.get("/download/qr/{filename}")
 def download_qr(filename: str):

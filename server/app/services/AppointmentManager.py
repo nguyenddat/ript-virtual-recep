@@ -258,3 +258,34 @@ class AppointmentManager(object):
                 )
             ).count()
             return cac_cuoc_hen
+
+    @staticmethod
+    def get_all_appointment():
+        payload = []
+        with next(get_db()) as db:
+            cac_cuoc_hen = db.query(CuocHen).order_by(
+                func.date(CuocHen.ngay_tao)
+            ).all()
+            for cuoc_hen in cac_cuoc_hen:
+                cuoc_hen_return = {
+                    "start_time": cuoc_hen.ngay_gio_bat_dau,
+                    "end_time": cuoc_hen.ngay_gio_ket_thuc,
+                    "purpose": cuoc_hen.muc_dich,
+                    "note": cuoc_hen.ghi_chu,
+                    "location": cuoc_hen.dia_diem,
+                    "status": cuoc_hen.trang_thai
+                }
+                
+                cac_lich_hen = db.query(LichHen).filter(LichHen.id_cuoc_hen == cuoc_hen.id).all()
+                participants = []
+                for lich_hen in cac_lich_hen:
+                    nguoi_dung = db.query(NguoiDung).filter(NguoiDung.cccd_id == lich_hen.cccd_id).first()
+                    base_role = roles[nguoi_dung.vai_tro]
+                    infor = db.query(base_role).filter(base_role.cccd_id == nguoi_dung.cccd_id).first()
+                    participants.append({
+                        "name": infor.ho_ten,
+                        "create": lich_hen.nguoi_hen
+                    })
+                cuoc_hen_return["participants"] = participants
+        return payload
+                    
