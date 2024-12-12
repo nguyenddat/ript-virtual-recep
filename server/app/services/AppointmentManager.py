@@ -264,7 +264,7 @@ class AppointmentManager(object):
                     "status": cuoc_hen.trang_thai
                 }
                 
-                cac_lich_hen = db.query(LichHen).filter(LichHen.id_cuoc_hen == cuoc_hen.id).all()
+                cac_lich_hen = db.query(LichHen).filter(LichHen.lich_hen_id == cuoc_hen.id).all()
                 participants = []
                 for lich_hen in cac_lich_hen:
                     nguoi_dung = db.query(NguoiDung).filter(NguoiDung.cccd_id == lich_hen.cccd_id).first()
