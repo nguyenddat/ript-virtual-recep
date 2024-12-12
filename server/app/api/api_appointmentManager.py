@@ -26,7 +26,9 @@ def check_role(role):
     return Khach
 
 @router.get("/api/appointments/stats/by-user")
-def get_appointments_by_user(cccd_id: str,
+def get_appointments_by_user(current_user = Depends(login_required),
+                             permission: PermissionRequired = Depends(PermissionRequired("admin")),
+                             cccd_id: str,
                              role: Optional[str] = None,
                              trang_thai: Optional[str] = None,
                              start_date: Optional[date] = None,
@@ -44,25 +46,39 @@ def get_appointments_by_user(cccd_id: str,
             
 @router.post("/api/appointments/create")
 def create_appointments(
+    current_user = Depends(login_required),
+    permission: PermissionRequired = Depends(PermissionRequired("admin")),
     data: Dict[str, Union[List[str], str]]
 ):
     AppointmentManager.post_appointment(data)
     return {"success": True, "error": None}
 
 @router.get("/api/appointments/stats/by-month")
-def get_appointments_by_month():
+def get_appointments_by_month(
+    current_user = Depends(login_required),
+    permission: PermissionRequired = Depends(PermissionRequired("admin"))
+):
     return AppointmentManager.get_appointment_by_month()
 
 @router.get("/api/appointments/stats/all-month")
-def get_appointments_all_month():
+def get_appointments_all_month(
+    current_user = Depends(login_required),
+    permission: PermissionRequired = Depends(PermissionRequired("admin"))
+):
     return AppointmentManager.get_appointment_all_month()
 
 @router.get("/api/appointments/stats/by-department")
-def get_appoiments_by_department():
+def get_appoiments_by_department(
+    current_user = Depends(login_required),
+    permission: PermissionRequired = Depends(PermissionRequired("admin"))
+):
     return AppointmentManager.get_most_appointment_department()
 
 @router.get("/api/appointments/stats/by-week")
-def get_appointments_by_week():
+def get_appointments_by_week(
+    current_user = Depends(login_required),
+    permission: PermissionRequired = Depends(PermissionRequired("admin"))
+):
     return AppointmentManager.get_appointment_by_week()
 
 @router.get("/download/qr/{filename}")

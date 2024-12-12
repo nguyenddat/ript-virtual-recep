@@ -10,7 +10,9 @@ weekly_schedule = WeeklySchedule.ScheduleParser()
 router = APIRouter()
 
 @router.post("/api/institude-calendar/post")
-def post_lich_tuan(file: UploadFile = File(...)):
+def post_lich_tuan(current_user = Depends(login_required),
+                   permission: PermissionRequired = Depends(PermissionRequired("admin")),
+                   file: UploadFile = File(...)):
     if not file:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail =  "No file found")
 
