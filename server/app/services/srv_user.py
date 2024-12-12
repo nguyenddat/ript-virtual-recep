@@ -3,7 +3,7 @@ import jwt
 from typing import Optional
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, HTTPBearer, HTTPAuthorizationCredentials
 from fastapi_sqlalchemy import db
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
@@ -41,13 +41,14 @@ class UserService(object):
             return user
 
     @staticmethod
-    def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(reusable_oauth2), db: Session = Depends(get_db)):
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
         try:
+            token = credentials.credentials
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.SECURITY_ALGORITHM])
             username: str = payload.get("sub")
             if username is None:
