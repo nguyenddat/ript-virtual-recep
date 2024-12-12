@@ -84,7 +84,7 @@ def get_officer_by_departments(phong_ban_id: Optional[int] = None, db = Depends(
         
 @router.get("/api/identity-data/get")
 def get_identityData(current_user = Depends(login_required),
-                        permission: PermissionRequired = Depends(PermissionRequired(current_user, "admin")),
+                        permission: PermissionRequired = Depends(PermissionRequired("admin")),
                         data: bool = True,
                         role: Optional[str] = None,
                         department_code: Optional[int] = None,
