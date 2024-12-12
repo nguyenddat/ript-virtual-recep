@@ -20,7 +20,9 @@ STATIC_DIR = os.path.join(os.getcwd(), "app", "static", "data")
 os.makedirs(STATIC_DIR, exist_ok = True)
 
 @router.get("/api/administrative-class/get")
-def get_administrative_class(db = Depends(get_db)):
+def get_administrative_class(current_user = Depends(login_required),
+                             permission: PermissionRequired = Depends(PermissionRequired("admin")),
+                             db = Depends(get_db)):
     try:
         lop_hanh_chinhs = db.query(LopHanhChinh).all()
         payload = [{
@@ -33,7 +35,9 @@ def get_administrative_class(db = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail = Exception)
 
 @router.get("/api/departments/get")
-def get_departments(db = Depends(get_db)):
+def get_departments(current_user = Depends(login_required),
+                    permission: PermissionRequired = Depends(PermissionRequired("admin")),
+                    db = Depends(get_db)):
     try:
         phong_bans = db.query(PhongBan).all()
         payload = [{
@@ -45,9 +49,11 @@ def get_departments(db = Depends(get_db)):
     except:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail = Exception)
             
-            
 @router.get("/api/officer/get/by-departments")
-def get_officer_by_departments(phong_ban_id: Optional[int] = None, db = Depends(get_db)):
+def get_officer_by_departments(current_user = Depends(login_required),
+                               permission: PermissionRequired = Depends(PermissionRequired("admin")), 
+                               phong_ban_id: Optional[int] = None, 
+                               db = Depends(get_db)):
     try:
         payload = []
         base_query = db.query(CanBo)
