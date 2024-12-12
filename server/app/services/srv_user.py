@@ -42,9 +42,7 @@ class UserService(object):
 
     @staticmethod
     def get_current_user(
-        credentials: HTTPAuthorizationCredentials = Depends(reusable_oauth2),
-        db: Session = Depends(get_db)
-    ):
+        credentials: HTTPAuthorizationCredentials = Depends(reusable_oauth2)):
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
@@ -58,10 +56,11 @@ class UserService(object):
                 raise credentials_exception
         except JWTError:
             raise credentials_exception
-        user = db.query(NguoiDung).filter(NguoiDung.cccd_id == username).first()
-        if user is None:
-            raise credentials_exception
-        return user
+        with next(get_db()) as db:
+            user = db.query(NguoiDung).filter(NguoiDung.cccd_id == username).first()
+            if user is None:
+                raise credentials_exception
+            return user
 
     @staticmethod
     def update_me(data: UserUpdateMeRequest, current_user: NguoiDung):
