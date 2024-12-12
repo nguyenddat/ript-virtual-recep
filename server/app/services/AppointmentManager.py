@@ -275,5 +275,6 @@ class AppointmentManager(object):
                         "create": lich_hen.nguoi_hen
                     })
                 cuoc_hen_return["participants"] = participants
+            payload.append(cuoc_hen_return)
         return payload
                     

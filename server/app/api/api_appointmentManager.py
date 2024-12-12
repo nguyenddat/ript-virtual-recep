@@ -100,13 +100,10 @@ def get_appointments_all(
     current_user = Depends(login_required),
     permission: PermissionRequired = Depends(PermissionRequired("admin"))    
 ):
-    try:
-        return {
-            "success": True, 
-            "payload": AppointmentManager.get_all_appointment()
-        }
-    except:
-        raise HTTPException(status_code = status.HTTP_500_INTERNAL_SERVER_ERROR, detail = "Lỗi lấy dữ liệu all")        
+    return {
+        "success": True, 
+        "payload": AppointmentManager.get_all_appointment()
+    }
 
 @router.get("/download/qr/{filename}")
 def download_qr(filename: str):
