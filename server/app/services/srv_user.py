@@ -53,10 +53,11 @@ class UserService(object):
         try:
             token = credentials.credentials
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.SECURITY_ALGORITHM])
-            username: str = payload.get("sub")
+            username: str = payload.get("payload", "").get("user_id", "")
             if username is None:
                 raise credentials_exception
         except JWTError:
+            print(True)
             raise credentials_exception
         user = db.query(NguoiDung).filter(NguoiDung.cccd_id == username).first()
         if user is None:
