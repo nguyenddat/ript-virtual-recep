@@ -5,6 +5,8 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, status, Depends
 
 from app.services import WeeklySchedule
 
+from app.helper.login_manager import PermissionRequired, login_required 
+
 weekly_schedule = WeeklySchedule.ScheduleParser()
 
 router = APIRouter()

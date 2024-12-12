@@ -7,7 +7,11 @@ from sqlalchemy.orm import Session
 from fastapi import APIRouter, HTTPException, status, UploadFile, File, Depends
 
 from app.db.base import get_db
+
 from app.services import ClassSchedule
+
+from app.helper.login_manager import PermissionRequired, login_required 
+
 from app.models.sinh_vien import SinhVien
 from app.models.can_bo import CanBo
 from app.models.can_bo_lop_tin_chi import CanBo_LopTinChi

@@ -6,6 +6,7 @@ from fastapi import APIRouter, HTTPException, status, UploadFile, File, Depends
 from fastapi.responses import FileResponse
 
 from app.db.base import get_db
+
 from app.models.sinh_vien import SinhVien
 from app.models.nguoi_dung import NguoiDung
 from app.models.lich_hen import LichHen
@@ -13,7 +14,10 @@ from app.models.phong_ban import PhongBan
 from app.models.can_bo import CanBo
 from app.models.cuoc_hen import CuocHen
 from app.models.khach import Khach
+
 from app.helper.update_expired import update_expired_status
+from app.helper.login_manager import PermissionRequired, login_required 
+
 from app.services.AppointmentManager import AppointmentManager
 
 router = APIRouter()
