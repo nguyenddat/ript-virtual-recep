@@ -21,7 +21,6 @@ os.makedirs(STATIC_DIR, exist_ok = True)
 
 @router.get("/api/administrative-class/get")
 def get_administrative_class(current_user = Depends(login_required),
-                             permission: PermissionRequired = Depends(PermissionRequired("admin")),
                              db = Depends(get_db)):
     try:
         lop_hanh_chinhs = db.query(LopHanhChinh).all()
@@ -36,7 +35,6 @@ def get_administrative_class(current_user = Depends(login_required),
 
 @router.get("/api/departments/get")
 def get_departments(current_user = Depends(login_required),
-                    permission: PermissionRequired = Depends(PermissionRequired("admin")),
                     db = Depends(get_db)):
     try:
         phong_bans = db.query(PhongBan).all()
@@ -50,39 +48,28 @@ def get_departments(current_user = Depends(login_required),
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail = Exception)
             
 @router.get("/api/officer/get/by-departments")
-def get_officer_by_departments(current_user = Depends(login_required),
-                               permission: PermissionRequired = Depends(PermissionRequired("admin")), 
+def get_officer_by_departments(current_user = Depends(login_required), 
                                phong_ban_id: Optional[int] = None, 
                                db = Depends(get_db)):
+    payload = []
+    base_query = db.query(CanBo)
+    if phong_ban_id:
+        phong_ban = db.query(PhongBan).filter(PhongBan.id == phong_ban_id).first()
+        if not phong_ban:
+            return {"success": False}
+            # raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Không tồn tại phòng ban: {str(phong_ban_id)}")
+        base_query = base_query.filter(CanBo.phong_ban_id == phong_ban.id)
     try:
-        payload = []
-        base_query = db.query(CanBo)
-        if phong_ban_id:
-            phong_ban = db.query(PhongBan).filter(PhongBan.id == phong_ban_id).first()
-            if not phong_ban:
-                return False
-                # raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Không tồn tại phòng ban: {str(phong_ban_id)}")
-
-            base_query = base_query.filter(CanBo.phong_ban_id == phong_ban.id)
         can_bos = base_query.all()
         for _ in can_bos:
-            data = _.data
             can_bo = {
                 "ma_can_bo": _.ma_can_bo,
                 "phong_ban_id": _.phong_ban_id,
                 "ho_ten": _.ho_ten,
                 "cccd_id": _.cccd_id,
                 "gioi_tinh": _.gioi_tinh,
-                "email": _.email,
-                "data": data,
-                "b64": []
+                "email": _.email
             }
-            if data:
-                data_path = os.path.join(os.getcwd(), "app", "data", can_bo["cccd_id"])
-                for file in os.listdir(data_path):
-                    if file.endswith(".txt"):
-                        with open(os.path.join(data_path, file), "r") as f:
-                            can_bo["b64"].append(f.read())
             payload.append(can_bo)
         return {"success": True, "payload": payload, "error": None}
     except:

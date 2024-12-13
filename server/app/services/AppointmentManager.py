@@ -28,39 +28,11 @@ roles = {
 
 class AppointmentManager(object):
     @staticmethod
-    def get_appointment_by_user(
-        cccd_id: str,
-        role: str,
-        trang_thai: Optional[str] = None,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None
-    ):
+    def get_appointment_by_user(user):
         payload = []
-        
-        if trang_thai and trang_thai not in ("pending", "confirmed", "finished", "canceled", "expired"):
-            raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Không tìm thấy trạng thái: {trang_thai}")
-        
-        if role and role not in ("student", "officer", "guest"):
-            raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Không tìm thấy role: {role}")
-        
-        nguoi_dung = db.query(NguoiDung).filter(NguoiDung.cccd_id == cccd_id, NguoiDung.vai_tro == role).first()
-        if not nguoi_dung:
-            raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"Không tìm thấy người dùng: {cccd_id}")           
-        
-        cac_lich_hens = db.query(LichHen).filter(LichHen.cccd_id == nguoi_dung.cccd_id).all()
+        cac_lich_hens = db.query(LichHen).filter(LichHen.cccd_id == user.cccd_id).all()
         for lich_hen in cac_lich_hen:
-            query = db.query(CuocHen).filter(CuocHen.id == lich_hen.lich_hen_id)
-            
-            if start_date:
-                start_date = format_day(start_date)
-                query = query.filter(format_day_db(CuocHen.ngay_gio_bat_dau) >= start_date)
-            
-            if end_date:
-                end_date = format_day(end_date)
-                query = query.filter(format_day_db(CuocHen.ngay_gio_ket_thuc) <= end_date)
-            
-            cuoc_hen = query.first()
-            
+            cuoc_hen = db.query(CuocHen).filter(CuocHen.id == lich_hen.lich_hen_id).first()
             if cuoc_hen:
                 payload.append({
                     "id": cuoc_hen.id,
