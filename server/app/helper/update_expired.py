@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import literal, func
+from sqlalchemy import literal, func, and_
 
 from app.db.base import get_db
 from app.models.cuoc_hen import CuocHen
