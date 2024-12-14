@@ -129,15 +129,15 @@ class AppointmentManager(object):
             db.refresh(cuoc_hen_moi)
             
             # Thông báo email cho người được hẹn
-            for nguoi_duoc_hen in nguoi_duoc_hens:
-                if nguoi_duoc_hen.email:
-                    email_manager.annouce(email = nguoi_duoc_hen.email, 
-                        can_bo = ", ".join([nguoi_duoc_hen.ho_ten for nguoi_duoc_hen in nguoi_duoc_hens]), 
-                        nguoi_dat_hen = nguoi_hen.ho_ten,
-                        ngay_dat_hen= f"{cuoc_hen_moi.ngay_gio_bat_dau}-{cuoc_hen_moi.ngay_gio_ket_thuc}", 
-                        muc_dich = muc_dich, 
-                        ghi_chu = ghi_chu, 
-                        trang_thai = "pending")
+            # for nguoi_duoc_hen in nguoi_duoc_hens:
+            #     if nguoi_duoc_hen.email:
+            #         email_manager.annouce(email = nguoi_duoc_hen.email, 
+            #             can_bo = ", ".join([nguoi_duoc_hen.ho_ten for nguoi_duoc_hen in nguoi_duoc_hens]), 
+            #             nguoi_dat_hen = nguoi_hen.ho_ten,
+            #             ngay_dat_hen= f"{cuoc_hen_moi.ngay_gio_bat_dau}-{cuoc_hen_moi.ngay_gio_ket_thuc}", 
+            #             muc_dich = muc_dich, 
+            #             ghi_chu = ghi_chu, 
+            #             trang_thai = "pending")
         return "success"
 
     @staticmethod
