@@ -70,11 +70,7 @@ class AppointmentManager(object):
             cccd_nguoi_duoc_hens = data["cccd_nguoi_duoc_hen"]
             dia_diem = data["dia_diem"]
             muc_dich = data["muc_dich"]
-            ghi_chu = None
-            try: 
-                ghi_chu = data["ghi_chu"]
-            except:
-                ghi_chu = "NULL"
+            ghi_chu = data["ghi_chu"] if data["ghi_chu"] != "" else "NULL"
             ngay_gio_bat_dau = data["ngay_gio_bat_dau"]
             ngay_gio_ket_thuc = data["ngay_gio_ket_thuc"]
             

@@ -96,19 +96,15 @@ def get_appointments_all(
         "payload": AppointmentManager.get_all_appointment()
     }
 
-@router.get("/download/qr/{filename}")
-def download_qr(filename: str):
-    file_path = os.path.join(QR_manager.qr_dir, filename)
+@router.get("/download/qr/")
+def download_qr(
+    qr_path: str,
+    current_user = Depends(login_required)
+):
+    file_path = os.path.join(os.getcwd(), "app", qr_path)
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="File không tồn tại")
-    return FileResponse(file_path, media_type="image/png", filename=filename)
-
-@router.get("/download/pdf/{filename}")
-def download_pdf(filename: str):
-    file_path = os.path.join(QRManager.pdf_dir, filename)
-    if not file_path.exists():
-        raise HTTPException(status_code=404, detail="File không tồn tại")
-    return FileResponse(file_path, media_type="application/pdf", filename=filename)
+    return FileResponse(file_path, media_type="image/png")
 
 # @router.post("/check-appointment/")
 # async def check_appointment(file: UploadFile = File(...)):
