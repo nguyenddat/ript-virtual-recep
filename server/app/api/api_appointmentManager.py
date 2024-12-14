@@ -32,7 +32,7 @@ router = APIRouter()
 @router.get("/api/appointments/stats/by-user")
 def get_appointments_by_user(current_user = Depends(login_required),
                              db = Depends(get_db)):
-    update_expired_status()
+    await update_expired_status()
     payload = AppointmentManager.get_appointment_by_user(
         user = current_user,
         db = db
