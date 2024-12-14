@@ -30,7 +30,7 @@ class AppointmentManager(object):
     @staticmethod
     def get_appointment_by_user(user, db):
         payload = []
-        cac_lich_hens = db.query(LichHen).filter(LichHen.cccd_id == user.cccd_id).all()
+        cac_lich_hen = db.query(LichHen).filter(LichHen.cccd_id == user.cccd_id).all()
         for lich_hen in cac_lich_hen:
             cuoc_hen = db.query(CuocHen).filter(CuocHen.id == lich_hen.lich_hen_id).first()
             if cuoc_hen:
