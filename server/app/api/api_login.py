@@ -76,6 +76,7 @@ async def login(form_data: LoginRequest, db: Session = Depends(get_db)):
                 "accessToken": create_access_token({"user_id": user.cccd_id}),
                 "user": {
                     "name": info.ho_ten,
+                    "cccd": info.cccd_id,
                     "role": user.vai_tro            
                 },
                 "expiresIn": settings.ACCESS_TOKEN_EXPIRE_SECONDS 
