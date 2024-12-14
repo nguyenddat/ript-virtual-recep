@@ -34,8 +34,7 @@ def get_administrative_class(current_user = Depends(login_required),
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail = Exception)
 
 @router.get("/api/departments/get")
-def get_departments(current_user = Depends(login_required),
-                    db = Depends(get_db)):
+def get_departments(db = Depends(get_db)):
     try:
         phong_bans = db.query(PhongBan).all()
         payload = [{
