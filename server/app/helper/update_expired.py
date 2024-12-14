@@ -23,3 +23,20 @@ def update_expired_status():
             db.commit()
         finally:
             db.close()
+
+def update_finish_status():
+    with next(get_db()) as db:
+        current_time = datetime.now()
+        try:
+            items = db.query(CuocHen).filter(
+                and_(
+                    func.date(CuocHen.ngay_gio_ket_thuc) < current_time,
+                    CuocHen.trang_thai == "confirmed"
+                )
+            ).all()
+            
+            for item in items:
+                item.trang_thai = "finished"
+            db.commit()
+        finally:
+            db.close()

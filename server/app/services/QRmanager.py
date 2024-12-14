@@ -67,8 +67,11 @@ class QRManager(object):
         c.save()
         return str(pdf_path)
     
-    def decode_qr_code(self, file_bytes) -> str:
-        np_img = np.frombuffer(file_bytes, np.uint8)
+    def decode_qr_code(self, b64_image) -> str:
+        if "," in b64_image:
+            b64_image = b64_image.split(",")[1]
+        img_bytes = base64.b64decode(b64_image)
+        np_img = np.frombuffer(img_bytes, np.uint8)
         img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
         decoded_objects = decode(img)
         if decoded_objects:

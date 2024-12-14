@@ -44,17 +44,37 @@ class AppointmentManager(object):
         cac_lich_hen = db.query(LichHen).filter(LichHen.cccd_id == user.cccd_id).all()
         for lich_hen in cac_lich_hen:
             cuoc_hen = db.query(CuocHen).filter(CuocHen.id == lich_hen.lich_hen_id).first()
-            if cuoc_hen:
-                payload.append({
-                    "id": cuoc_hen.id,
-                    "ngay_gio_bat_dau": cuoc_hen.ngay_gio_bat_dau,
-                    "ngay_gio_ket_thuc": cuoc_hen.ngay_gio_ket_thuc,
-                    "dia_diem": cuoc_hen.dia_diem,
-                    "trang_thai": cuoc_hen.trang_thai,
-                    "muc_dich": cuoc_hen.muc_dich,
-                    "ghi_chu": cuoc_hen.ghi_chu,
-                    "qr_code": cuoc_hen.qr_path
+            cuoc_hen_return = {
+                "id": cuoc_hen.id,
+                "ngay_gio_bat_dau": cuoc_hen.ngay_gio_bat_dau,
+                "ngay_gio_ket_thuc": cuoc_hen.ngay_gio_ket_thuc,
+                "nguoi_duoc_hen": [],
+                "dia_diem": cuoc_hen.dia_diem,
+                "trang_thai": cuoc_hen.trang_thai,
+                "muc_dich": cuoc_hen.muc_dich,
+                "ghi_chu": cuoc_hen.ghi_chu,
+                "qr_code": cuoc_hen.qr_path
+            }
+            
+            cac_lich_hen_voi_nguoi_duoc_hen = db.query(LichHen).filter(
+                and_(
+                    LichHen.lich_hen_id == cuoc_hen.id,
+                    LichHen.nguoi_hen.is_(False)
+                )
+            ).all()
+            for lich_hen_voi_nguoi_duoc_hen in cac_lich_hen_voi_nguoi_duoc_hen:
+                nguoi_dung_nguoi_duoc_hen = db.query(NguoiDung).filter(NguoiDung.cccd_id == lich_hen_voi_nguoi_duoc_hen.cccd_id).first()
+                base_role = roles[NguoiDung.vai_tro]
+                nguoi_duoc_hen = db.query(base_role).filter(base_role.cccd_id == nguoi_dung_nguoi_duoc_hen.cccd_id).first()
+                cuoc_hen_return["nguoi_duoc_hen"].append({
+                    "cccd_id": nguoi_duoc_hen.cccd_id,
+                    "ho_ten": nguoi_duoc_hen.ho_ten,
+                    "gioi_tinh": nguoi_duoc_hen.gioi_tinh,
+                    "email": nguoi_duoc_hen.email,
+                    "ma_can_bo": nguoi_duoc_hen.ma_can_bo,
+                    "phong_ban_id": nguoi_duoc_hen.phong_ban_id 
                 })
+            payload.append(cuoc_hen_return)   
         return payload
     
     @staticmethod
@@ -274,6 +294,42 @@ class AppointmentManager(object):
             if not lich_hen:
                 return None
         return cuoc_hen
+
+    @staticmethod
+    def checkin_appointment(db, id):
+        cuoc_hen = db.query(CuocHen).filter(CuocHen.id == id).first()
+        trang_thai = cuoc_hen.trang_thai
+        if trang_thai == "expired":
+            raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = "Bạn không thể checkin vì lịch hẹn đã quá hạn")
+        elif trang_thai == "pending":
+            raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = "Bạn không thể checkin vì lịch hẹn cần được xác nhận")
+        elif trang_thai == "canceled":
+            raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = "Bạn không thể checkin vì lịch hẹn đã bị hủy")
+        elif trang_thai == "finished":
+            raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = "Bạn không thể checkin vì lịch hẹn đã hoàn thành")
+            
+        cac_lich_hen = db.query(LichHen).filter(LichHen.lich_hen_id == cuoc_hen.id).all()
+        nguoi_hen = None
+        nguoi_duoc_hens = []
+        for lich_hen in cac_lich_hen:
+            nguoi_dung = db.query(NguoiDung).filter(NguoiDung.cccd_id == lich_hen.cccd_id).first()
+            base_role = roles[nguoi_dung.vai_tro]
+            infor = db.query(base_role).filter(base_role.cccd_id == nguoi_dung.cccd_id).first()
+            if lich_hen.nguoi_hen is True:
+                nguoi_hen = infor
+            else:
+                nguoi_duoc_hens.append(infor)
         
+        for nguoi in nguoi_duoc_hens + [nguoi_hen]:
+            if nguoi.email:
+                email_manager.annouce(email = nguoi.email, 
+                    can_bo = ", ".join([nguoi_duoc_hen.ho_ten for nguoi_duoc_hen in nguoi_duoc_hens]), 
+                    nguoi_dat_hen = nguoi_hen.ho_ten,
+                    ngay_dat_hen= f"{cuoc_hen_moi.ngay_gio_bat_dau}-{cuoc_hen_moi.ngay_gio_ket_thuc}", 
+                    muc_dich = muc_dich, 
+                    ghi_chu = ghi_chu,
+                    trang_thai = "confirmed")
+
+        return {"success": True}
 
                     
