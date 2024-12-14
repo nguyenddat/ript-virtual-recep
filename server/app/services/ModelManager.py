@@ -105,9 +105,10 @@ class KNN:
         for data in self.data:
             X.extend(data["X"])
             y.extend([data["y"]] * len(data["X"]))
-        print(X)
-        print(y)
         distances = []
+        print(X[0])
+        print(type(X[0]))
+        print(X[0].embedding)
         current_k = min(self.k, len(X))
         for i in range(len(X)):
             cosine_sim = cosine_similarity(img_array, X[i].embedding)
