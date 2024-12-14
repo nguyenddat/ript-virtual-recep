@@ -258,4 +258,22 @@ class AppointmentManager(object):
                 cuoc_hen_return["participants"] = participants
                 payload.append(cuoc_hen_return)
         return payload
+    
+    @staticmethod
+    def check_appointment(db, id, user):
+        cuoc_hen = db.query(CuocHen).filter(CuocHen.id == id).first()
+        if not cuoc_hen:
+            return None
+        else:
+            lich_hen = db.query(LichHen).filter(
+                and_(
+                    LichHen.cccd_id = user.cccd_id,
+                    LichHen.lich_hen_id == id
+                )
+            ).first()
+            if not lich_hen:
+                return None
+        return cuoc_hen
+        
+
                     
