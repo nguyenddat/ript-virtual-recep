@@ -26,6 +26,17 @@ roles = {
     "guest": Khach
 }
 
+def strip_static_path(path):
+    path = path.replace("\\", "/")
+    static_path = []
+    before_static = True
+    for direc in path.split("/"):
+        if direc == "static":
+            before_static = False
+        if not before_static:
+            static_path.append(direc)
+    return "/".join(static_path)
+
 class AppointmentManager(object):
     @staticmethod
     def get_appointment_by_user(user, db):
@@ -41,7 +52,8 @@ class AppointmentManager(object):
                     "dia_diem": cuoc_hen.dia_diem,
                     "trang_thai": cuoc_hen.trang_thai,
                     "muc_dich": cuoc_hen.muc_dich,
-                    "ghi_chu": cuoc_hen.ghi_chu
+                    "ghi_chu": cuoc_hen.ghi_chu,
+                    "qr_code": cuoc_hen.qr_path
                 })
         return payload
     
@@ -123,8 +135,8 @@ class AppointmentManager(object):
             }, qr_path, pdf_filename)
             
             # Cập nhật thông tin qr, pdf cho dữ liệu cuộc hẹn
-            cuoc_hen_moi.qr_path = qr_path
-            cuoc_hen_moi.pdf_path = pdf_path
+            cuoc_hen_moi.qr_path = strip_static_path(qr_path)
+            cuoc_hen_moi.pdf_path = strip_static_path(pdf_path)
             db.commit()
             db.refresh(cuoc_hen_moi)
             
