@@ -267,7 +267,7 @@ class AppointmentManager(object):
         else:
             lich_hen = db.query(LichHen).filter(
                 and_(
-                    LichHen.cccd_id = user.cccd_id,
+                    LichHen.cccd_id == user.cccd_id,
                     LichHen.lich_hen_id == id
                 )
             ).first()
