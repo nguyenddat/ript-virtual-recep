@@ -72,6 +72,7 @@ class AppointmentManager(object):
                 ngay_gio_ket_thuc = ngay_gio_ket_thuc,
                 dia_diem = dia_diem,
                 muc_dich = muc_dich,
+                ghi_chu = ghi_chu,
                 ngay_tao = str(datetime.datetime.now())
             )
             db.add(cuoc_hen_moi)

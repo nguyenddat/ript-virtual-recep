@@ -85,7 +85,7 @@ class EmailManager(object):
             <div class="content">
                 <p>Kính gửi <strong>{}</strong>,</p>
                 
-                <p>Chúng tôi xin nhắc nhở về lịch hẹn của quý khách với thông tin chi tiết như sau:</p>
+                <p>Hệ thống trợ lý ảo Kiosk xin nhắc nhở về lịch hẹn của quý khách với thông tin chi tiết như sau:</p>
                 
                 <div class="appointment-info">
                     <div class="info-row">
@@ -115,7 +115,7 @@ class EmailManager(object):
                 </div>
 
                 <div class="footer">
-                    <p>Xin vui lòng kiểm tra thông tin và sớm xác nhận trạng thái đối với lịch hẹn. 
+                    <p>Quý vị xin vui lòng kiểm tra thông tin và sớm xác nhận trạng thái đối với lịch hẹn. 
                     Chúng tôi mong đợi được phục vụ quý khách và hy vọng cuộc hẹn sẽ diễn ra suôn sẻ.</p>
                     
                     <div class="signature">
