@@ -18,7 +18,7 @@ class QRManager(object):
     def generate_qr_code(self, data: str, filename: str) -> str:
         if not os.path.exists(self.qr_dir):
             os.mkdir(self.qr_dir)
-        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr = qrcode.QRCode(version=1, box_size=10, border=1)
         qr.add_data(data)
         qr.make(fit=True)
         img = qr.make_image(fill='black', back_color='white')
