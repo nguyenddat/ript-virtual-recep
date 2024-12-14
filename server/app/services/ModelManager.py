@@ -103,9 +103,8 @@ class KNN:
     def predict(self, img_array):
         X, y = [], []
         for data in self.data:
-            for face in data["X"]:
-                X.append(face)
-                y.append(data["y"])
+            X.extend(data["X"])
+            y.extend([data["y"]] * len(data["X"]))
         distances = []
         current_k = min(self.k, len(X))
         for i in range(len(X)):
@@ -165,7 +164,6 @@ class ModelManager:
                 return data
             except:
                 print(f"Không thể tải dữ liệu backup --> Tải dữ liệu thủ công...")
-                data = []
                 for nguoi_dung in cac_sinh_vien + cac_can_bo + cac_khach:
                     X, y = [], nguoi_dung.cccd_id
                     data_dir = os.path.join(os.getcwd(), "app", "data", str(y))
@@ -174,7 +172,7 @@ class ModelManager:
                             img_path = os.path.join(data_dir, file)
                             image = np.array(Image.open(img_path).convert("RGB"))
                             faces, nums_of_people = self.embed_face(image)
-                            X += faces
+                            X.extend(faces)
                     with open(os.path.join(data_dir, "backup.pkl"), "wb") as file:
                         pickle.dump({"X": X, "y": y}, file)
                     data.append({"X": X, "y": y})
