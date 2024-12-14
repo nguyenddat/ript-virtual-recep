@@ -105,6 +105,8 @@ class KNN:
         for data in self.data:
             X.extend(data["X"])
             y.extend([data["y"]] * len(data["X"]))
+        print(X)
+        print(y)
         distances = []
         current_k = min(self.k, len(X))
         for i in range(len(X)):
