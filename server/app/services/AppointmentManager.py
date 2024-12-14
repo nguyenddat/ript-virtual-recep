@@ -64,7 +64,7 @@ class AppointmentManager(object):
             ).all()
             for lich_hen_voi_nguoi_duoc_hen in cac_lich_hen_voi_nguoi_duoc_hen:
                 nguoi_dung_nguoi_duoc_hen = db.query(NguoiDung).filter(NguoiDung.cccd_id == lich_hen_voi_nguoi_duoc_hen.cccd_id).first()
-                base_role = roles[str(NguoiDung.vai_tro)]
+                base_role = roles[nguoi_dung_nguoi_duoc_hen.vai_tro]
                 nguoi_duoc_hen = db.query(base_role).filter(base_role.cccd_id == nguoi_dung_nguoi_duoc_hen.cccd_id).first()
                 cuoc_hen_return["nguoi_duoc_hen"].append({
                     "cccd_id": nguoi_duoc_hen.cccd_id,
