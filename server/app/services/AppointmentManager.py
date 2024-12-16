@@ -441,7 +441,7 @@ class AppointmentManager(object):
             if nguoi.email:
                 update_email_manager.annouce(
                     email = nguoi.email,
-                    ho_ten_nguoi_duoc_hen = nguoi.ho_ten
+                    ho_ten_nguoi_duoc_hen = nguoi.ho_ten,
                     nguoi_dat_hen = nguoi_hen.ho_ten,
                     ngay_dat_hen= f"Từ {cuoc_hen_moi.ngay_gio_bat_dau} đến {cuoc_hen_moi.ngay_gio_ket_thuc}", 
                     nguoi_duoc_hen = ", ".join([nguoi_duoc_hen.ho_ten for nguoi_duoc_hen in nguoi_duoc_hens]), 
@@ -503,7 +503,7 @@ class AppointmentManager(object):
                 
                 update_email_manager.annouce(
                     email = nguoi.email,
-                    ho_ten_nguoi_duoc_hen = nguoi_duoc_hen.ho_ten
+                    ho_ten_nguoi_duoc_hen = nguoi_duoc_hen.ho_ten,
                     nguoi_dat_hen = nguoi_duoc_hen.ho_ten,
                     ngay_dat_hen= f"Từ {cuoc_hen_moi.ngay_gio_bat_dau} đến {cuoc_hen_moi.ngay_gio_ket_thuc}", 
                     nguoi_duoc_hen = ", ".join([nguoi_duoc_hen.ho_ten for nguoi_duoc_hen in nguoi_duoc_hens]), 
