@@ -20,8 +20,7 @@ STATIC_DIR = os.path.join(os.getcwd(), "app", "static", "data")
 os.makedirs(STATIC_DIR, exist_ok = True)
 
 @router.get("/api/administrative-class/get")
-def get_administrative_class(current_user = Depends(login_required),
-                             db = Depends(get_db)):
+def get_administrative_class(db = Depends(get_db)):
     try:
         lop_hanh_chinhs = db.query(LopHanhChinh).all()
         payload = [{

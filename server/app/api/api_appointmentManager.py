@@ -22,13 +22,6 @@ from app.services.AppointmentManager import AppointmentManager
 
 router = APIRouter()
 
-# def check_role(role):
-#     if role == "student":
-#         return SinhVien
-#     elif role == "officer":
-#         return CanBo
-#     return Khach
-
 @router.get("/api/appointments/stats/by-user")
 def get_appointments_by_user(current_user = Depends(login_required),
                              db = Depends(get_db)):
@@ -48,6 +41,11 @@ def create_appointments(
     AppointmentManager.post_appointment(data)
     return {"success": True, "error": None}
 
+@router.post("/api/appointments/create/public")
+def create_appointments(data: Dict[str, Union[List[str], str]]):
+    AppointmentManager.post_appointment_public(data)
+    return {"success": True, "error": None}
+    
 @router.get("/api/appointments/stats/by-month")
 def get_appointments_by_month(
     current_user = Depends(login_required),
@@ -103,21 +101,13 @@ def download_qr(
     current_user = Depends(login_required),
     db = Depends(get_db)
 ):
-    cuoc_hen = AppointmentManager.check_appointment(db = db,
-                                                    id = id, 
-                                                    user = current_user)
+    cuoc_hen = AppointmentManager.check_appointment(db = db, id = id, user = current_user)
     if not cuoc_hen:
         raise HTTPException(status_code = status.HTTP_403_FORBIDDEN, detail = "Bạn không có cuộc hẹn này")
     qr_path = os.path.join(os.getcwd(), "app", cuoc_hen.qr_path)
     return FileResponse(qr_path, media_type="image/png")
 
 @router.post("/api/appointments/check-appointment/")
-def check_appointment(data: str,
-                      db = Depends(get_db)):
-    
-    appointment_id = QR_manager.decode_qr_code(file_bytes)
-    
-    if not appointment_id.isdigit():
-        raise HTTPException(status_code=400, detail="Dữ liệu QR code không hợp lệ")
-    
+def check_appointment(data: str, db = Depends(get_db)):
+    appointment_id = QR_manager.decode_qr_code(file_bytes).id
     return AppointmentManager.checkin_appointment(db = db, id = appointment_id)

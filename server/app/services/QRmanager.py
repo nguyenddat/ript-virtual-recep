@@ -15,7 +15,7 @@ class QRManager(object):
         self.qr_dir = os.path.join(os.getcwd(), "app", "static", "qr_codes")
         self.pdf_dir = os.path.join(os.getcwd(), "app", "static", "pdf_files")
         
-    def generate_qr_code(self, data: str, filename: str) -> str:
+    def generate_qr_code(self, data: dict, filename: str) -> str:
         if not os.path.exists(self.qr_dir):
             os.mkdir(self.qr_dir)
         qr = qrcode.QRCode(version=1, box_size=10, border=1)
@@ -79,3 +79,5 @@ class QRManager(object):
             return qr_data
         else:
             raise ValueError("Không thể giải mã QR code")
+
+QR_manager = QRManager()
