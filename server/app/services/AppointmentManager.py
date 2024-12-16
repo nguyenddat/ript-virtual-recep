@@ -487,7 +487,7 @@ class AppointmentManager(object):
 
                 cancel_email_manager.annouce(
                     email = nguoi_duoc_hen.email,
-                    ho_ten_nguoi_duoc_hen = nguoi_duoc_hen.ho_ten
+                    ho_ten_nguoi_duoc_hen = nguoi_duoc_hen.ho_ten,
                     nguoi_dat_hen = nguoi_duoc_hen.ho_ten,
                     ngay_dat_hen= f"Từ {cuoc_hen.ngay_gio_bat_dau} đến {cuoc_hen.ngay_gio_ket_thuc}", 
                     nguoi_duoc_hen = None, 
