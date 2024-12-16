@@ -190,7 +190,7 @@ class AppointmentManager(object):
                         email = nguoi_duoc_hen.email, 
                         ho_ten_nguoi_duoc_hen = nguoi_duoc_hen.ho_ten, 
                         nguoi_dat_hen = nguoi_hen.ho_ten,
-                        nguoi_duoc_hen = ", ".join([temp.ho_ten for temp in nguoi_duoc_hens])
+                        nguoi_duoc_hen = ", ".join(temp.ho_ten for temp in nguoi_duoc_hens)
                         ngay_dat_hen= f"Từ {cuoc_hen_moi.ngay_gio_bat_dau} đến {cuoc_hen_moi.ngay_gio_ket_thuc}", 
                         muc_dich = muc_dich, 
                         ghi_chu = ghi_chu)
