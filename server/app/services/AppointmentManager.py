@@ -231,7 +231,7 @@ class AppointmentManager(object):
             nguoi_dung_moi = NguoiDung(
                 cccd_id = cccd_nguoi_hen,
                 hashed_password = get_password_hashed(cccd_nguoi_hen),
-                vai_tro = "guest"
+                vai_tro = "guest",
                 ngay_tao = str(datetime.now())
             )
             db.add(nguoi_dung_moi)
