@@ -5,6 +5,7 @@ from collections import Counter
 
 from app.schemas.face_recognition.KNNData import KNNData
 from app.schemas.face_recognition.FaceEmbedding import PersonData
+from app.helper.face_recognition_helpers import cosine_similarity
 
 class KNN:
     def __init__(self):
