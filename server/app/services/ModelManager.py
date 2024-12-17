@@ -55,7 +55,7 @@ class ModelManager:
                 if file.endswith(".png"):
                     img_path = os.path.join(data_dir, file)
                     image = np.array(Image.open(img_path).convert("RGB"))
-                    faces = nums_of_people = self.model.embed_face(image)
+                    faces, nums_of_people = self.model.embed_face(image)
                     X.extend(faces)
             data_return = {
                 "X": X,
