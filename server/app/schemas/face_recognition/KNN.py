@@ -16,27 +16,23 @@ class KNN:
         self.save_model_path = os.path.join(os.getcwd(), "app", "core", "data.pkl")
 
     def load_data(self, knnData: KNNData):
-        # validated_data = KNNData(data = knnData).data
         self.data = knnData
         self.build_index()
         self.save_data()
-        print(self.data)
             
     def build_index(self):
         self.cccd_index = {personData["y"]: i for i, personData in enumerate(self.data)}
     
-    def add_data(self, personData):
-        validated_data = PersonData(data = personData).data
-        self.data.append(validated_data)
-        self.cccd_index[validated_data["y"]] = len(self.data) - 1
+    def add_data(self, personData: PersonData):
+        self.data.append(personData)
+        self.cccd_index[personData["y"]] = len(self.data) - 1
     
-    def update_data(self, personData):
-        validated_data = PersonData(data = personData).data
-        if validated_data["y"] not in self.cccd_index.keys():
-            self.add_data(validated_data)
+    def update_data(self, personData: PersonData):
+        if personData["y"] not in self.cccd_index.keys():
+            self.add_data(personData)
         else:
-            index = self.cccd_index[validated_data["y"]]
-            self.data[index]["X"] = validated_data["X"]
+            index = self.cccd_index[personData["y"]]
+            self.data[index]["X"] = personData["X"]
 
     def save_data(self):
         with open(self.save_model_path, "wb") as file:
@@ -55,7 +51,7 @@ class KNN:
             X.extend(personData["X"])
             y.extend([personData["y"]] * len(personData["X"]))
         distances = []
-        print(X, y)
+        print(distances)
         current_k = min(self.k, len(X))
         for i in range(len(X)):
             cosine_sim = cosine_similarity(img_array, X[i].embedding)
@@ -64,6 +60,7 @@ class KNN:
 
         top_k = sorted(distances, key = lambda x: x[1], reverse = True)[:current_k]
         most_common = Counter([label for label, _ in top_k]).most_common()
+        print(most_common)
         if len(most_common) == 0:
             return "Khách"
         elif len(most_common) == 1:

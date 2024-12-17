@@ -90,7 +90,6 @@ class ModelManager:
                 
                 for future in concurrent.futures.as_completed(futures):
                     result = future.result()
-                    print(result)
                     data.append(result)
             return data
             # except:
