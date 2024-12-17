@@ -1,4 +1,5 @@
 from fastapi import HTTPException, Depends
+from datetime import datetime
 from passlib.context import CryptContext
 
 from app.models.nguoi_dung import NguoiDung
@@ -19,3 +20,15 @@ class PermissionRequired:
         if self.user.vai_tro not in self.permissions and self.permissions:
             raise HTTPException(status_code=400,
                                 detail=f'User can not access this api')
+            
+def create_new_user(db, cccd_id, password, role):
+    nguoi_dung_moi = NguoiDung(
+        cccd_id=cccd_id,
+        hashed_password=get_password_hash(password),
+        vai_tro=role,
+        ngay_tao=str(datetime.now())
+    )
+
+    db.add(nguoi_dung_moi)
+    db.commit()
+    db.refresh(nguoi_dung_moi)

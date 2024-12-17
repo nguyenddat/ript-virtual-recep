@@ -6,6 +6,8 @@ from app.db.base import get_db
 from app.models.khach import Khach
 from app.models.nguoi_dung import NguoiDung
 
+from app.helper.login_manager import create_new_user
+
 def update_existing_guest(db, khach, personal_data):
     khach.ho_ten = personal_data["Name"]
     khach.gioi_tinh = personal_data["Gender"]
@@ -23,24 +25,13 @@ def create_new_guest(db, personal_data):
         ngay_sinh=personal_data["DOB"],
         data=True
     )
-    
-    nguoi_dung_moi = NguoiDung(
-        cccd_id=personal_data["Identity Code"],
-        hashed_password=get_password_hash(personal_data["Identity Code"]),
-        vai_tro="guest",
-        ngay_tao=str(datetime.now())
-    )
-    
     db.add(khach_moi)
-    db.add(nguoi_dung_moi)
-    
     print(f"Tạo khách mới: {personal_data['Identity Code']}")
-    print(f"Tạo người dùng mới: {personal_data['Identity Code']}")
-    
     db.commit()
     db.refresh(khach_moi)
-    db.refresh(nguoi_dung_moi)
-
+    
+    create_new_user(db, personal_data["Identity Code"], personal_data["Identity Code"], "guest")    
+    
 def update_guest(personal_data):
     with next(get_db()) as db:
         khach = db.query(Khach).filter(

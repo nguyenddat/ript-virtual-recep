@@ -47,3 +47,5 @@ class ImageManager(object):
             img_binary = base64.b64decode(img_b64)
             image = Image.open(io.BytesIO(img_binary))
             image.save(file_dir)
+
+image_manager = ImageManager()

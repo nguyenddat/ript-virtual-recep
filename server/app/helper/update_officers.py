@@ -7,6 +7,8 @@ from app.models.can_bo import CanBo
 from app.models.nguoi_dung import NguoiDung
 from app.models.phong_ban import PhongBan
 
+from app.helper.login_manager import create_new_user
+
 def update_existing_officer(db, can_bo, phong_ban, personal_data):
     if can_bo.cccd_id != personal_data["Identity Code"]:
         raise HTTPException(
@@ -44,23 +46,12 @@ def create_new_officer(db, phong_ban, personal_data):
         ngay_sinh=personal_data["DOB"],
         data=True
     )
-    
-    nguoi_dung_moi = NguoiDung(
-        cccd_id=personal_data["Identity Code"],
-        hashed_password=get_password_hash(personal_data["Identity Code"]),
-        vai_tro="officer",
-        ngay_tao=str(datetime.now())
-    )
-    
     db.add(can_bo_moi)
-    db.add(nguoi_dung_moi)
-    
-    print(f"Tạo cán bộ mới: {personal_data['Identity Code']}")
-    print(f"Tạo người dùng mới: {personal_data['Identity Code']}")
-    
+    print(f"Tạo cán bộ mới: {personal_data['Identity Code']}")    
     db.commit()
     db.refresh(can_bo_moi)
-    db.refresh(nguoi_dung_moi)
+    
+    create_new_user(db, personal_data["Identity Code"], personal_data["Identity Code"], "officer")
 
 def update_officer(personal_data):
     with next(get_db()) as db:
