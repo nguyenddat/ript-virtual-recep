@@ -3,7 +3,7 @@ import numpy as np
 
 from typing import Dict, Union, AnyStr, List, Optional
 from dataclasses import dataclass
-from pydantic import Field, validator
+from pydantic import Field, validator, BaseModel
 
 @dataclass
 class FaceEmbedding:
@@ -17,7 +17,7 @@ class FaceEmbedding:
             raise ValueError("embedding must be a numpy array")
 
 @dataclass
-class PersonData:
+class PersonData(BaseModel):
     data: Dict[
         Union["y", "X"], Union[AnyStr, List[FaceEmbedding]] 
     ] = Field(description = "Personal's identity code and each picture embedding")
