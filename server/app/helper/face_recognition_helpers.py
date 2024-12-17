@@ -29,7 +29,7 @@ def get_base_role(nguoi_dung):
     return base_roles[nguoi_dung.vai_tro]
 
 def get_infor(cccd_id):
-    with next(get_db) as db:
+    with next(get_db()) as db:
         nguoi_dung = db.query(NguoiDung).filter(
             NguoiDung.cccd_id == cccd_id
         ).first()
