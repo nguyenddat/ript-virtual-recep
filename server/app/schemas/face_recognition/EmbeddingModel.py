@@ -3,6 +3,8 @@ import os
 import numpy as np
 from insightface.app import FaceAnalysis
 
+from app.schemas.face_recognition.FaceEmbedding import FaceEmbedding
+
 class EmbeddingModel:
     def __init__(self):
         self.model = FaceAnalysis(name = "buffalo_l")
