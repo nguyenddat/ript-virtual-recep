@@ -51,7 +51,6 @@ class KNN:
             X.extend(personData["X"])
             y.extend([personData["y"]] * len(personData["X"]))
         distances = []
-        print(distances)
         current_k = min(self.k, len(X))
         for i in range(len(X)):
             cosine_sim = cosine_similarity(img_array, X[i].embedding)
@@ -60,7 +59,6 @@ class KNN:
 
         top_k = sorted(distances, key = lambda x: x[1], reverse = True)[:current_k]
         most_common = Counter([label for label, _ in top_k]).most_common()
-        print(most_common)
         if len(most_common) == 0:
             return "Khách"
         elif len(most_common) == 1:

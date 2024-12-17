@@ -161,6 +161,7 @@ class ModelManager:
         else:
             if len(faces) == 1:
                 person = self.KNN.predict(faces[0].embedding)
+                print(person)
                 person = get_infor(person)
                 result.update({"main": person})
             else:

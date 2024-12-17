@@ -39,6 +39,7 @@ def get_infor(cccd_id):
             infor = db.query(base_role).filter(
                 base_role.cccd_id == nguoi_dung.cccd_id
             ).first()
+            print(infor)
             return {
                 "name": infor.ho_ten,
                 "cccd": infor.cccd_id,
