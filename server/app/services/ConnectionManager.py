@@ -32,3 +32,5 @@ class ConnectionManager:
     async def broadcast_some(self, response: dict, websocket_list: List[WebSocket]):
         for connection in websocket_list:
             await connection.send_text(json.dumps(response))
+            
+connection_manager = ConnectionManager()
