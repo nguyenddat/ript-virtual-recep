@@ -80,20 +80,20 @@ class ModelManager:
                 cac_can_bo = db.query(CanBo).filter(CanBo.data.is_(True)).all()
                 cac_khach = db.query(Khach).filter(Khach.data.is_(True)).all()
             cac_nguoi_dung = cac_sinh_vien + cac_can_bo + cac_khach
-            try:
-                """Không thể tải dữ liệu đã lưu --> Tải dữ liệu backup..."""
-                with concurrent.futures.ThreadPoolExecutor() as executor:
-                    futures = {
-                        executor.submit(self.load_user_data, nguoi_dung): nguoi_dung 
-                        for nguoi_dung in cac_nguoi_dung
-                    }
-                    
-                    for future in concurrent.futures.as_completed(futures):
-                        result = future.result()
-                        data.append(result)
-                return data
-            except:
-                print("ERROR")
+            # try:
+            """Không thể tải dữ liệu đã lưu --> Tải dữ liệu backup..."""
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                futures = {
+                    executor.submit(self.load_user_data, nguoi_dung): nguoi_dung 
+                    for nguoi_dung in cac_nguoi_dung
+                }
+                
+                for future in concurrent.futures.as_completed(futures):
+                    result = future.result()
+                    data.append(result)
+            return data
+            # except:
+            #     print("ERROR")
 
                              
     def update_data(self, data_dir, personal_data):            
