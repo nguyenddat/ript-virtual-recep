@@ -13,9 +13,9 @@ class KNN:
         self.cccd_index = {}
         self.save_model_path = os.path.join(os.getcwd(), "app", "core", "data.pkl")
 
-    def load_data(self, knnData):
-        validated_data = KNNData(data = knnData).data
-        self.data = validated_data
+    def load_data(self, knnData: KNNData):
+        # validated_data = KNNData(data = knnData).data
+        self.data = knnData
         self.build_index()
             
     def build_index(self):
