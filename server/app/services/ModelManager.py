@@ -63,7 +63,7 @@ class ModelManager:
             }
             backup_file_dir = os.path.join(data_dir, "backup.pkl")
             with open(backup_file_dir, "wb") as file:
-                pickle.dump(data_return)
+                pickle.dump(data_return, file)
             return data_return
                 
     
