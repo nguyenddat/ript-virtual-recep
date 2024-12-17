@@ -5,7 +5,6 @@ from typing import Dict, Union, AnyStr, List, Optional
 from dataclasses import dataclass
 from pydantic import Field, validator, BaseModel
 
-@dataclass
 class FaceEmbedding:
     def __init__(self, embedding, bbox):
         self.embedding = embedding
@@ -16,7 +15,6 @@ class FaceEmbedding:
         if not instance(self.embedding, np.ndarray):
             raise ValueError("embedding must be a numpy array")
 
-@dataclass
 class PersonData(BaseModel):
     data: Dict[
         Union["y", "X"], Union[AnyStr, List[FaceEmbedding]] 
