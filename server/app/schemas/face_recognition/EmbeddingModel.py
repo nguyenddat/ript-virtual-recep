@@ -5,8 +5,9 @@ from insightface.app import FaceAnalysis
 class EmbeddingModel:
     def __init__(self):
         self.model = FaceAnalysis(name = "buffalo_l")
-    
-    def __post_init__(self):
+        self._post_init()
+        
+    def _post_init(self):
         self.model.prepare(ctx_id = 0, det_size = (640, 640))
         os.system('cls||clear')
 

@@ -35,12 +35,14 @@ class ModelManager:
     def __init__(self):
         self.model = embedding_model
         self.KNN = knn
-    
-    def __post_init__(self):
+        _post_init()
+        
+    def _post_init(self):
         raw_data = self.load_data()
         self.KNN.load_data(raw_data)
         print(f"Có {len(self.KNN.data)} dữ liệu")
-
+        
+    
     def load_user_data(self, nguoi_dung):
         data_dir = os.path.join(os.getcwd(), "app", "data", nguoi_dung.cccd_id)
         try:

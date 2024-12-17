@@ -9,10 +9,8 @@ class FaceEmbedding:
     def __init__(self, embedding, bbox):
         self.embedding = embedding
         self.bbox = bbox
-    
-    def __post_init__(self):
         self._validate_embedding()
-    
+       
     def _validate_embedding(self):
         if not instance(self.embedding, np.ndarray):
             raise ValueError("embedding must be a numpy array")
