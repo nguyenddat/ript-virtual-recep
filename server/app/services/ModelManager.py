@@ -35,7 +35,7 @@ class ModelManager:
     def __init__(self):
         self.model = embedding_model
         self.KNN = knn
-        _post_init()
+        self._post_init()
         
     def _post_init(self):
         raw_data = self.load_data()
