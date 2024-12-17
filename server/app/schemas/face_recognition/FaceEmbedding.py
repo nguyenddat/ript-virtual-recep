@@ -20,7 +20,7 @@ class FaceEmbedding:
 @dataclass
 class PersonData:
     data: Dict[
-        Union["y", "X"], Union[AnyStr, List[Optional(FaceEmbedding)]] 
+        Union["y", "X"], Union[AnyStr, List[FaceEmbedding]] 
     ] = Field(description = "Personal's identity code and each picture embedding")
         
     @validator("data")
