@@ -12,7 +12,7 @@ class FaceEmbedding:
         self._validate_embedding()
        
     def _validate_embedding(self):
-        if not instance(self.embedding, np.ndarray):
+        if not isinstance(self.embedding, np.ndarray):
             raise ValueError("embedding must be a numpy array")
 
 class PersonData(BaseModel):
@@ -22,12 +22,12 @@ class PersonData(BaseModel):
         
     @validator("data")
     def validate_y(cls, v):
-        if not instance(v["y"], str):
+        if not isinstance(v["y"], str):
             raise ValueError("y must be string of person's identity code")
         
-        if not instance(v["X"], list):
+        if not isinstance(v["X"], list):
             raise ValueError("X must be a list of embedding")
         
         for face_embedding in v["X"]:
-            if not instance(face_embedding, FaceEmbedding):
+            if not isinstance(face_embedding, FaceEmbedding):
                 raise ValueError("element of X must be face embedding")

@@ -10,7 +10,7 @@ class KNNData(BaseModel):
     @validator("data")
     def validate_KNN_data(cls, v):
         for entry in v:
-            if not instance(entry, PersonData):
+            if not isinstance(entry, PersonData):
                 raise ValueError("element in KNN data must be person data")
         return v
 
