@@ -20,6 +20,7 @@ class KNN:
         self.data = knnData
         self.build_index()
         self.save_data()
+        print(self.data)
             
     def build_index(self):
         self.cccd_index = {personData["y"]: i for i, personData in enumerate(self.data)}
