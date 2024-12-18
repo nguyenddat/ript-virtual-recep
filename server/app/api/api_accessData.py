@@ -2,11 +2,12 @@ import os
 import shutil
 
 from fastapi import APIRouter, Depends, status, HTTPException
-from sqlalchemy import literal, func
+from sqlalchemy import literal, func, case, and_
 from sqlalchemy.orm import Session
 from typing import Optional
 
-from app.helper.login_manager import PermissionRequired, login_required 
+from app.helper.login_manager import PermissionRequired, login_required
+from app.helper.face_recognition_helpers import get_base_role
 from app.db.base import get_db
 from app.models.phong_ban import PhongBan
 from app.models.can_bo import CanBo
@@ -81,44 +82,90 @@ def get_identityData(current_user = Depends(login_required),
                         department_code: Optional[int] = None,
                         db: Session = Depends(get_db)):
     payload = []
-    roles = {"student": [SinhVien, LopHanhChinh], "officer": [CanBo, PhongBan],  "guest": [Khach]}
     base_query = db.query(NguoiDung)
     if role:
         base_query = base_query.filter(NguoiDung.vai_tro == role)
     nguoi_dungs = base_query.filter(NguoiDung.vai_tro != "admin").all()
     for nguoi_dung in nguoi_dungs:
-        base_role = roles[nguoi_dung.vai_tro][0]
-        infor = db.query(base_role).filter(base_role.cccd_id == nguoi_dung.cccd_id, base_role.data.is_(data)).first()
-        if not infor:
-            continue
-        nguoi_dung_return = {
-            "name": infor.ho_ten,
-            "role": nguoi_dung.vai_tro,
-            "dob": infor.ngay_sinh,
-            "gender": infor.gioi_tinh,
-            "img": []
-        }
-        if nguoi_dung_return["role"] != "guest":
-            table = roles[nguoi_dung.vai_tro][1]
-            if nguoi_dung_return["role"] == "student":
-                lop_hanh_chinh = db.query(table).filter(table.id == infor.id_lop_hanh_chinh).first()
-                nguoi_dung_return["department"] = {
-                    "department_id": lop_hanh_chinh.id,
-                    "department_name": lop_hanh_chinh.ten_lop_hanh_chinh
+        base_role = get_base_role(nguoi_dung)
+        query = db.query(
+            base_role.ho_ten, nguoi_dung.vai_tro,
+            base_role.ngay_sinh, base_role.gioi_tinh,
+            case(
+                [(NguoiDung.vai_tro == "student", LopHanhChinh.id)],
+                else_ = PhongBan.id
+            ).label("department_id"),
+            case(
+                [(NguoiDung.vai_tro == "student", LopHanhChinh.ten_lop_hanh_chinh)],
+                else_ = PhongBan.ten_phong_ban
+            ).label("department_name")
+        ).join(
+            NguoiDung, base_role.cccd_id == NguoiDung.cccd_id
+        ).outerjoin(
+            LopHanhChinh, base_role.id_lop_hanh_chinh = LopHanhChinh.id
+        ).outerjoin(
+            PhongBan, base_role.phong_ban_id == PhongBan.id
+        ).filter(
+            and_(            
+                base_role.cccd_id == nguoi_dung.cccd_id,
+                base_role.data.is_(True)
+            )
+        ).first()
+        
+        if query:
+            nguoi_dung_return = {
+                "name": query.ho_ten,
+                "role": query.vai_tro,
+                "dob": query.ngay_sinh,
+                "gender": query.gioi_tinh,
+                "img": [],
+                "department": {
+                    "department_id": query.department_id,
+                    "department_name": query.department_name
                 }
-            else:
-                phong_ban = db.query(table).filter(table.id == infor.phong_ban_id).first()
-                nguoi_dung_return["department"] = {
-                    "department_id": phong_ban.id,
-                    "department_name": phong_ban.ten_phong_ban
-                }
+            }
+        
         if data:
-            user_static_dir = os.path.join(STATIC_DIR, infor.cccd_id)
-            os.makedirs(user_static_dir, exist_ok = True)
-            for file in os.listdir(user_static_dir):
+            user_static_dir = os.path.join(STATIC_DIR, nguoi_dung.cccd_id)
+            for file in os.lisdir(user_static_dir):
                 if file.endswith(".png"):
-                    static_url_path = f"/static/data/{infor.cccd_id}/{file}"
+                    static_url_path = f"/static/data/{nguoi_dung.cccd_id}/{file}"
                     nguoi_dung_return["img"].append(static_url_path)
-
+        
         payload.append(nguoi_dung_return)
     return {"success": True, "payload": payload, "error": None}
+        
+    #     infor = db.query(base_role).filter(base_role.cccd_id == nguoi_dung.cccd_id, base_role.data.is_(data)).first()
+    #     if not infor:
+    #         continue
+    #     nguoi_dung_return = {
+    #         "name": infor.ho_ten,
+    #         "role": nguoi_dung.vai_tro,
+    #         "dob": infor.ngay_sinh,
+    #         "gender": infor.gioi_tinh,
+    #         "img": []
+    #     }
+    #     if nguoi_dung_return["role"] != "guest":
+    #         table = roles[nguoi_dung.vai_tro][1]
+    #         if nguoi_dung_return["role"] == "student":
+    #             lop_hanh_chinh = db.query(table).filter(table.id == infor.id_lop_hanh_chinh).first()
+    #             nguoi_dung_return["department"] = {
+    #                 "department_id": lop_hanh_chinh.id,
+    #                 "department_name": lop_hanh_chinh.ten_lop_hanh_chinh
+    #             }
+    #         else:
+    #             phong_ban = db.query(table).filter(table.id == infor.phong_ban_id).first()
+    #             nguoi_dung_return["department"] = {
+    #                 "department_id": phong_ban.id,
+    #                 "department_name": phong_ban.ten_phong_ban
+    #             }
+    #     if data:
+    #         user_static_dir = os.path.join(STATIC_DIR, infor.cccd_id)
+    #         os.makedirs(user_static_dir, exist_ok = True)
+    #         for file in os.listdir(user_static_dir):
+    #             if file.endswith(".png"):
+    #                 static_url_path = f"/static/data/{infor.cccd_id}/{file}"
+    #                 nguoi_dung_return["img"].append(static_url_path)
+
+    #     payload.append(nguoi_dung_return)
+    # return {"success": True, "payload": payload, "error": None}
