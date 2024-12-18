@@ -86,88 +86,38 @@ def get_identityData(current_user = Depends(login_required),
     if role:
         base_query = base_query.filter(NguoiDung.vai_tro == role)
     nguoi_dungs = base_query.filter(NguoiDung.vai_tro != "admin").all()
-    for nguoi_dung in nguoi_dungs:
-        base_role = get_base_role(nguoi_dung)
-        query = db.query(base_role,
-            case(
-                (nguoi_dung.vai_tro == "student", LopHanhChinh.id),
-                else_ = None
-            ).label("department_id"),
-            case(
-                (nguoi_dung.vai_tro == "student", LopHanhChinh.ten_lop_hanh_chinh),
-                else_ = None
-            ).label("department_name")
-        ).outerjoin(
-            LopHanhChinh, and_(
-                LopHanhChinh.id == base_role.id_lop_hanh_chinh,
-                nguoi_dung.vai_tro == "student"
-            )
-        ).outerjoin(
-            PhongBan, and_(
-                PhongBan.id == base_role.phong_ban_id,
-                nguoi_dung.vai_tro == "officer"
-            )
-        ).filter(
-            and_(            
-                base_role.cccd_id == nguoi_dung.cccd_id,
-                base_role.data.is_(True)
-            )
-        ).first()
-        
-        if query:
-            nguoi_dung_return = {
-                "name": query.ho_ten,
-                "role": query.vai_tro,
-                "dob": query.ngay_sinh,
-                "gender": query.gioi_tinh,
-                "img": [],
-                "department": {
-                    "department_id": query.department_id,
-                    "department_name": query.department_name
+    for nguoi_dung in nguoi_dungs:        
+        infor = db.query(base_role).filter(base_role.cccd_id == nguoi_dung.cccd_id, base_role.data.is_(data)).first()
+        if not infor:
+            continue
+        nguoi_dung_return = {
+            "name": infor.ho_ten,
+            "role": nguoi_dung.vai_tro,
+            "dob": infor.ngay_sinh,
+            "gender": infor.gioi_tinh,
+            "img": []
+        }
+        if nguoi_dung_return["role"] != "guest":
+            table = roles[nguoi_dung.vai_tro][1]
+            if nguoi_dung_return["role"] == "student":
+                lop_hanh_chinh = db.query(table).filter(table.id == infor.id_lop_hanh_chinh).first()
+                nguoi_dung_return["department"] = {
+                    "department_id": lop_hanh_chinh.id,
+                    "department_name": lop_hanh_chinh.ten_lop_hanh_chinh
                 }
-            }
-        
+            else:
+                phong_ban = db.query(table).filter(table.id == infor.phong_ban_id).first()
+                nguoi_dung_return["department"] = {s
+                    "department_id": phong_ban.id,
+                    "department_name": phong_ban.ten_phong_ban
+                }
         if data:
-            user_static_dir = os.path.join(STATIC_DIR, nguoi_dung.cccd_id)
+            user_static_dir = os.path.join(STATIC_DIR, infor.cccd_id)
+            os.makedirs(user_static_dir, exist_ok = True)
             for file in os.listdir(user_static_dir):
                 if file.endswith(".png"):
-                    static_url_path = f"/static/data/{nguoi_dung.cccd_id}/{file}"
+                    static_url_path = f"/static/data/{infor.cccd_id}/{file}"
                     nguoi_dung_return["img"].append(static_url_path)
-        
+
         payload.append(nguoi_dung_return)
     return {"success": True, "payload": payload, "error": None}
-        
-    #     infor = db.query(base_role).filter(base_role.cccd_id == nguoi_dung.cccd_id, base_role.data.is_(data)).first()
-    #     if not infor:
-    #         continue
-    #     nguoi_dung_return = {
-    #         "name": infor.ho_ten,
-    #         "role": nguoi_dung.vai_tro,
-    #         "dob": infor.ngay_sinh,
-    #         "gender": infor.gioi_tinh,
-    #         "img": []
-    #     }
-    #     if nguoi_dung_return["role"] != "guest":
-    #         table = roles[nguoi_dung.vai_tro][1]
-    #         if nguoi_dung_return["role"] == "student":
-    #             lop_hanh_chinh = db.query(table).filter(table.id == infor.id_lop_hanh_chinh).first()
-    #             nguoi_dung_return["department"] = {
-    #                 "department_id": lop_hanh_chinh.id,
-    #                 "department_name": lop_hanh_chinh.ten_lop_hanh_chinh
-    #             }
-    #         else:
-    #             phong_ban = db.query(table).filter(table.id == infor.phong_ban_id).first()
-    #             nguoi_dung_return["department"] = {
-    #                 "department_id": phong_ban.id,
-    #                 "department_name": phong_ban.ten_phong_ban
-    #             }
-    #     if data:
-    #         user_static_dir = os.path.join(STATIC_DIR, infor.cccd_id)
-    #         os.makedirs(user_static_dir, exist_ok = True)
-    #         for file in os.listdir(user_static_dir):
-    #             if file.endswith(".png"):
-    #                 static_url_path = f"/static/data/{infor.cccd_id}/{file}"
-    #                 nguoi_dung_return["img"].append(static_url_path)
-
-    #     payload.append(nguoi_dung_return)
-    # return {"success": True, "payload": payload, "error": None}
