@@ -2,7 +2,7 @@ import os
 import shutil
 
 from fastapi import APIRouter, Depends, status, HTTPException
-from sqlalchemy import literal, func, case, and_
+from sqlalchemy import literal, func, case, and_, text
 from sqlalchemy.orm import Session
 from typing import Optional
 
@@ -92,11 +92,11 @@ def get_identityData(current_user = Depends(login_required),
             base_role.ho_ten, nguoi_dung.vai_tro,
             base_role.ngay_sinh, base_role.gioi_tinh,
             case(
-                (NguoiDung.vai_tro == literal("student"), LopHanhChinh.id),
+                (NguoiDung.vai_tro == text("student"), LopHanhChinh.id),
                 else_ = PhongBan.id
             ).label("department_id"),
             case(
-                (NguoiDung.vai_tro == literal("student"), LopHanhChinh.ten_lop_hanh_chinh),
+                (NguoiDung.vai_tro == text("student"), LopHanhChinh.ten_lop_hanh_chinh),
                 else_ = PhongBan.ten_phong_ban
             ).label("department_name")
         ).join(
