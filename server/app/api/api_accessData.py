@@ -82,6 +82,7 @@ def get_identityData(current_user = Depends(login_required),
                         department_code: Optional[int] = None,
                         db: Session = Depends(get_db)):
     payload = []
+    roles = {"student": [SinhVien, LopHanhChinh], "officer": [CanBo, PhongBan], "guest": [Khach]}
     base_query = db.query(NguoiDung)
     if role:
         base_query = base_query.filter(NguoiDung.vai_tro == role)
