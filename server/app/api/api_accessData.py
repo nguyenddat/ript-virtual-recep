@@ -102,7 +102,7 @@ def get_identityData(current_user = Depends(login_required),
         ).join(
             NguoiDung, base_role.cccd_id == NguoiDung.cccd_id
         ).outerjoin(
-            LopHanhChinh, base_role.id_lop_hanh_chinh = LopHanhChinh.id
+            LopHanhChinh, base_role.id_lop_hanh_chinh == LopHanhChinh.id
         ).outerjoin(
             PhongBan, base_role.phong_ban_id == PhongBan.id
         ).filter(
