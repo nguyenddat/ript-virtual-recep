@@ -86,7 +86,8 @@ def get_identityData(current_user = Depends(login_required),
     if role:
         base_query = base_query.filter(NguoiDung.vai_tro == role)
     nguoi_dungs = base_query.filter(NguoiDung.vai_tro != "admin").all()
-    for nguoi_dung in nguoi_dungs:        
+    for nguoi_dung in nguoi_dungs:
+        base_role = get_base_role(nguoi_dung)        
         infor = db.query(base_role).filter(base_role.cccd_id == nguoi_dung.cccd_id, base_role.data.is_(data)).first()
         if not infor:
             continue
