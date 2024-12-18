@@ -92,11 +92,11 @@ def get_identityData(current_user = Depends(login_required),
             base_role.ho_ten, nguoi_dung.vai_tro,
             base_role.ngay_sinh, base_role.gioi_tinh,
             case(
-                (NguoiDung.vai_tro == column("student"), LopHanhChinh.id),
+                (nguoi_dung.vai_tro == column("student"), LopHanhChinh.id),
                 else_ = PhongBan.id
             ).label("department_id"),
             case(
-                (NguoiDung.vai_tro == column("student"), LopHanhChinh.ten_lop_hanh_chinh),
+                (nguoi_dung.vai_tro == column("student"), LopHanhChinh.ten_lop_hanh_chinh),
                 else_ = PhongBan.ten_phong_ban
             ).label("department_name")
         ).join(
