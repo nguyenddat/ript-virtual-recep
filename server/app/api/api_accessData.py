@@ -88,19 +88,15 @@ def get_identityData(current_user = Depends(login_required),
     nguoi_dungs = base_query.filter(NguoiDung.vai_tro != "admin").all()
     for nguoi_dung in nguoi_dungs:
         base_role = get_base_role(nguoi_dung)
-        query = db.query(
-            base_role.ho_ten, nguoi_dung.vai_tro,
-            base_role.ngay_sinh, base_role.gioi_tinh,
+        query = db.query(base_role,
             case(
-                (nguoi_dung.vai_tro == column("student"), LopHanhChinh.id),
+                (nguoi_dung.vai_tro == "student", LopHanhChinh.id),
                 else_ = PhongBan.id
             ).label("department_id"),
             case(
-                (nguoi_dung.vai_tro == column("student"), LopHanhChinh.ten_lop_hanh_chinh),
+                (nguoi_dung.vai_tro == "student", LopHanhChinh.ten_lop_hanh_chinh),
                 else_ = PhongBan.ten_phong_ban
             ).label("department_name")
-        ).join(
-            NguoiDung, NguoiDung.cccd_id == base_role.cccd_id
         ).outerjoin(
             LopHanhChinh, LopHanhChinh.id == base_role.id_lop_hanh_chinh
         ).outerjoin(
