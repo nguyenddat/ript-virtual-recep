@@ -92,11 +92,11 @@ def get_identityData(current_user = Depends(login_required),
             base_role.ho_ten, nguoi_dung.vai_tro,
             base_role.ngay_sinh, base_role.gioi_tinh,
             case(
-                (NguoiDung.vai_tro == "student", LopHanhChinh.id),
+                (NguoiDung.vai_tro == literal("student"), LopHanhChinh.id),
                 else_ = PhongBan.id
             ).label("department_id"),
             case(
-                (NguoiDung.vai_tro == "student", LopHanhChinh.ten_lop_hanh_chinh),
+                (NguoiDung.vai_tro == literal("student"), LopHanhChinh.ten_lop_hanh_chinh),
                 else_ = PhongBan.ten_phong_ban
             ).label("department_name")
         ).join(
@@ -127,7 +127,7 @@ def get_identityData(current_user = Depends(login_required),
         
         if data:
             user_static_dir = os.path.join(STATIC_DIR, nguoi_dung.cccd_id)
-            for file in os.lisdir(user_static_dir):
+            for file in os.listdir(user_static_dir):
                 if file.endswith(".png"):
                     static_url_path = f"/static/data/{nguoi_dung.cccd_id}/{file}"
                     nguoi_dung_return["img"].append(static_url_path)
