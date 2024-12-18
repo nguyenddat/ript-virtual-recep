@@ -107,7 +107,7 @@ def get_identityData(current_user = Depends(login_required),
                 }
             else:
                 phong_ban = db.query(table).filter(table.id == infor.phong_ban_id).first()
-                nguoi_dung_return["department"] = {s
+                nguoi_dung_return["department"] = {
                     "department_id": phong_ban.id,
                     "department_name": phong_ban.ten_phong_ban
                 }
