@@ -92,19 +92,19 @@ def get_identityData(current_user = Depends(login_required),
             base_role.ho_ten, nguoi_dung.vai_tro,
             base_role.ngay_sinh, base_role.gioi_tinh,
             case(
-                (NguoiDung.vai_tro == text("student"), LopHanhChinh.id),
+                (NguoiDung.vai_tro == "student", LopHanhChinh.id),
                 else_ = PhongBan.id
             ).label("department_id"),
             case(
-                (NguoiDung.vai_tro == text("student"), LopHanhChinh.ten_lop_hanh_chinh),
+                (NguoiDung.vai_tro == "student", LopHanhChinh.ten_lop_hanh_chinh),
                 else_ = PhongBan.ten_phong_ban
             ).label("department_name")
         ).join(
-            NguoiDung, base_role.cccd_id == NguoiDung.cccd_id
+            NguoiDung, NguoiDung.cccd_id == base_role.cccd_id
         ).outerjoin(
-            LopHanhChinh, base_role.id_lop_hanh_chinh == LopHanhChinh.id
+            LopHanhChinh, LopHanhChinh.id == base_role.id_lop_hanh_chinh
         ).outerjoin(
-            PhongBan, base_role.phong_ban_id == PhongBan.id
+            PhongBan, PhongBan.id == base_role.phong_ban_id
         ).filter(
             and_(            
                 base_role.cccd_id == nguoi_dung.cccd_id,
