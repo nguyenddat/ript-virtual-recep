@@ -91,16 +91,22 @@ def get_identityData(current_user = Depends(login_required),
         query = db.query(base_role,
             case(
                 (nguoi_dung.vai_tro == "student", LopHanhChinh.id),
-                else_ = PhongBan.id
+                else_ = None
             ).label("department_id"),
             case(
                 (nguoi_dung.vai_tro == "student", LopHanhChinh.ten_lop_hanh_chinh),
-                else_ = PhongBan.ten_phong_ban
+                else_ = None
             ).label("department_name")
         ).outerjoin(
-            LopHanhChinh, LopHanhChinh.id == base_role.id_lop_hanh_chinh
+            LopHanhChinh, and_(
+                LopHanhChinh.id == base_role.id_lop_hanh_chinh,
+                nguoi_dung.vai_tro == "student"
+            )
         ).outerjoin(
-            PhongBan, PhongBan.id == base_role.phong_ban_id
+            PhongBan, and_(
+                PhongBan.id == base_role.phong_ban_id,
+                nguoi_dung.vai_tro == "officer"
+            )
         ).filter(
             and_(            
                 base_role.cccd_id == nguoi_dung.cccd_id,
