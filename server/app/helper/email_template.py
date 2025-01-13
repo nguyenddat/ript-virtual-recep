@@ -397,6 +397,109 @@ def get_class_schedule_template():
                 
                 <div class="schedule-info">
                     <div class="info-row">
+                        <span class="label">Tên sinh viên:</span> 
+                        <span>{}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Tên lớp học:</span> 
+                        <span>{}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Thời gian:</span> 
+                        <span>{}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Giảng viên:</span> 
+                        <span>{}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Địa điểm:</span> 
+                        <span>{}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Ghi chú:</span> 
+                        <span>{}</span>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <p>Vui lòng kiểm tra lại thông tin và liên hệ với chúng tôi nếu có bất kỳ thắc mắc nào.</p>
+                    
+                    <div class="signature">
+                        <p>Trân trọng,<br>
+                        <strong>Ban Quản Lý</strong><br>
+                        <small>Hệ thống quản lý học tập</small></p>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+    return """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body {{
+                    font-family: Arial, Helvetica, sans-serif;
+                    line-height: 1.6;
+                    color: #333333;
+                    max-width: 600px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }}
+                .header {{
+                    background-color: #2196F3;
+                    color: white;
+                    padding: 20px;
+                    border-radius: 5px 5px 0 0;
+                    text-align: center;
+                }}
+                .content {{
+                    background-color: #f9f9f9;
+                    padding: 20px;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 0 0 5px 5px;
+                }}
+                .schedule-info {{
+                    margin: 20px 0;
+                    background-color: white;
+                    padding: 15px;
+                    border-radius: 5px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                }}
+                .info-row {{
+                    margin: 10px 0;
+                    border-bottom: 1px solid #eee;
+                    padding-bottom: 8px;
+                }}
+                .label {{
+                    font-weight: bold;
+                    color: #2196F3;
+                    width: 150px;
+                    display: inline-block;
+                }}
+                .footer, .signature {{
+                    margin-top: 20px;
+                    padding-top: 20px;
+                    border-top: 2px solid #eee;
+                    color: #666;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h2>THÔNG BÁO LỊCH HỌC MỚI</h2>
+            </div>
+            
+            <div class="content">
+                <p>Kính gửi <strong>{}</strong>,</p>
+                
+                <p>Dưới đây là lịch học mới của bạn:</p>
+                
+                <div class="schedule-info">
+                    <div class="info-row">
                         <span class="label">Tên lớp học:</span> 
                         <span>{}</span>
                     </div>
