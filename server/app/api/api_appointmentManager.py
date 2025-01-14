@@ -4,7 +4,7 @@ from typing import Optional, List, Dict, Union
 from datetime import datetime, date
 from fastapi import APIRouter, HTTPException, status, UploadFile, File, Depends
 from fastapi.responses import FileResponse
-
+from .. services.QRmanager import *
 from app.db.base import get_db
 
 from app.models.sinh_vien import SinhVien
@@ -108,6 +108,25 @@ def download_qr(
     return FileResponse(qr_path, media_type="image/png")
 
 @router.post("/api/appointments/check-appointment/")
-def check_appointment(data: str, db = Depends(get_db)):
-    appointment_id = QR_manager.decode_qr_code(file_bytes).id
-    return AppointmentManager.checkin_appointment(db = db, id = appointment_id)
+async def check_appointment(file: UploadFile = File(...), db= Depends(get_db)):
+    if file.content_type not in ["image/png", "image/jpeg", "image/jpg"]:
+        raise HTTPException(status_code=400, detail="Chỉ hỗ trợ định dạng PNG, JPEG, JPG.")
+
+    try:
+        file_bytes = await file.read()  
+        appointment_id = QR_manager.decode_qr_code(file_bytes)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        # Trả về thông báo lỗi cụ thể hơn
+        raise HTTPException(status_code=500, detail=f"Lỗi khi xử lý file ảnh: {str(e)}")
+    
+    # Kiểm tra lịch hẹn
+    try:
+        appointment = AppointmentManager.checkin_appointment(db=db, id=appointment_id)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lỗi khi kiểm tra lịch hẹn: {str(e)}")
+    
+    return appointment

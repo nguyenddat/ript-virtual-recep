@@ -65,10 +65,10 @@ def get_application() -> FastAPI:
         allow_headers=["*"],
     )
     application.add_middleware(DBSessionMiddleware, db_url=settings.DATABASE_URL)
-    application.include_router(api_accessData.router, tags = ["accessData"])
+    # application.include_router(api_accessData.router, tags = ["accessData"])
     application.include_router(api_appointmentManager.router, tags = ["appointmentManager"])
     application.include_router(api_classSchedule.router, tags = ["classSchedule"])
-    application.include_router(api_faceRecognition.router, tags = ["faceRecognition"])   
+    # application.include_router(api_faceRecognition.router, tags = ["faceRecognition"])   
     application.include_router(api_login.router, tags=["login"])  
     application.include_router(api_weeklySchedule.router, tags = ["weeklySchedule"])
 

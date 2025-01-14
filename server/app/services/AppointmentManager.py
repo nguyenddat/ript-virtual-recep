@@ -415,6 +415,8 @@ class AppointmentManager(object):
     @staticmethod
     def checkin_appointment(db, id):
         cuoc_hen = db.query(CuocHen).filter(CuocHen.id == id).first()
+        if not cuoc_hen:
+            raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail ="Không tìm thấy lịch hẹn")
         trang_thai = cuoc_hen.trang_thai
         if trang_thai == "expired":
             raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = "Bạn không thể checkin vì lịch hẹn đã quá hạn")

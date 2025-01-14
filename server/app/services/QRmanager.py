@@ -67,17 +67,20 @@ class QRManager(object):
         c.save()
         return str(pdf_path)
     
-    def decode_qr_code(self, b64_image) -> str:
-        if "," in b64_image:
-            b64_image = b64_image.split(",")[1]
-        img_bytes = base64.b64decode(b64_image)
-        np_img = np.frombuffer(img_bytes, np.uint8)
-        img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
-        decoded_objects = decode(img)
-        if decoded_objects:
-            qr_data = decoded_objects[0].data.decode('utf-8')
-            return qr_data
-        else:
-            raise ValueError("Không thể giải mã QR code")
+    def decode_qr_code(self, file_bytes: bytes) -> str:
+        try:
+            np_img = np.frombuffer(file_bytes, np.uint8)
+            img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
+            if img is None:
+                raise ValueError("Không thể giải mã ảnh từ dữ liệu đã tải lên.")
+
+            decoded_objects = decode(img)
+            if decoded_objects:
+                qr_data = decoded_objects[0].data.decode('utf-8')
+                return qr_data
+            else:
+                raise ValueError("Không thể giải mã QR code.")
+        except Exception as e:
+            raise e
 
 QR_manager = QRManager()
