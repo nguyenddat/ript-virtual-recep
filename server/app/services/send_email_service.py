@@ -188,7 +188,6 @@ class SendMailServices(object):
                             su_kien.dia_diem,               # {}
                             su_kien.ghi_chu if su_kien.ghi_chu else "Không có mô tả."  # {}
                         )
-
                         # Gửi email tới TEST_EMAIL
                         event_notification_email_manager.send_email(
                             email=TEST_EMAIL,
