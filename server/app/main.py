@@ -18,7 +18,7 @@ from app.db.base import engine
 from app.core.config import settings
 from app.helper.exception_handler import CustomException, http_exception_handler
 from app.helper.update_expired import update_expired_status         
-
+from app.api import test_send_mail
 logging.config.fileConfig(settings.LOGGING_CONFIG_FILE, disable_existing_loggers=False)
 
 Base.metadata.create_all(bind=engine)
@@ -73,7 +73,7 @@ def get_application() -> FastAPI:
     application.include_router(api_weeklySchedule.router, tags = ["weeklySchedule"])
     application.include_router(send_mail.router, tags=["send_mail"])
     application.add_exception_handler(CustomException, http_exception_handler)
-
+    application.include_router(test_send_mail.router, tags=["test send mail"])
     application.mount("/static", StaticFiles(directory = "app/static"), name = "static")
     return application
 
