@@ -3,11 +3,11 @@ import smtplib
 from abc import ABC, abstractmethod
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-
+import logging
 from .. helper.email_template import *
-
+logger = logging.getLogger(__name__)
 from .. core.config import settings
-
+import os
 class EmailManager(ABC):
     def __init__(self):
         self.HOST = "smtp.gmail.com"
@@ -51,6 +51,25 @@ class Create_EmailManager(EmailManager):
         with smtplib.SMTP_SSL(self.HOST, self.PORT) as sv:
             sv.login(self._admin_account, self._admin_password)
             sv.sendmail(self._admin_account, recipients, msg.as_string())
+    def send_email(self, email, recipient_name, html_content):
+            """Phương thức để gửi email tạo cuộc hẹn."""
+            test_mode = os.getenv('TEST_MODE', 'False').lower() in ('true', '1', 't')
+            if test_mode:
+                email = os.getenv('TEST_EMAIL', 'dinhtran29092005@gmail.com')
+            
+            recipients = [self._admin_account, email]
+            msg = MIMEMultipart('alternative')
+            msg["Subject"] = "THÔNG BÁO TẠO CUỘC HẸN MỚI"
+            msg["From"] = self._admin_account
+            msg["To"] = ", ".join(recipients)
+            msg.attach(MIMEText(html_content, 'html'))
+            try:
+                with smtplib.SMTP_SSL(self.HOST, self.PORT) as sv:
+                    sv.login(self._admin_account, self._admin_password)
+                    sv.sendmail(self._admin_account, [email], msg.as_string())
+                logger.info(f"Create appointment email sent to {email}")
+            except smtplib.SMTPException as e:
+                logger.error(f"Error sending create appointment email to {email}: {e}")
 
 class Cancel_EmailManager(EmailManager):
     def __init__(self):
@@ -132,6 +151,25 @@ class ClassSchedule_EmailManager(EmailManager):
         with smtplib.SMTP_SSL(self.HOST, self.PORT) as sv:
             sv.login(self._admin_account, self._admin_password)
             sv.sendmail(self._admin_account, recipients, msg.as_string())
+    def send_email(self, email, recipient_name, html_content):
+        """Phương thức để gửi email với nội dung HTML tùy chỉnh."""
+        test_mode = os.getenv('TEST_MODE', 'False').lower() in ('true', '1', 't')
+        if test_mode:
+            email = os.getenv('TEST_EMAIL', 'dinhtran29092005@gmail.com')
+        
+        recipients = [self._admin_account, email]
+        msg = MIMEMultipart('alternative')
+        msg["Subject"] = "THÔNG BÁO LỊCH HỌC MỚI"
+        msg["From"] = self._admin_account
+        msg["To"] = ", ".join(recipients)
+        msg.attach(MIMEText(html_content, 'html'))
+        try:
+            with smtplib.SMTP_SSL(self.HOST, self.PORT) as sv:
+                sv.login(self._admin_account, self._admin_password)
+                sv.sendmail(self._admin_account, [email], msg.as_string())
+            logger.info(f"Class schedule email sent to {email}")
+        except smtplib.SMTPException as e:
+            logger.error(f"Error sending class schedule email to {email}: {e}")
 class TeachingSchedule_EmailManager(EmailManager):
     def __init__(self):
         super().__init__()

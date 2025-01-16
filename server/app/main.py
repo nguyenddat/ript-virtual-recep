@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from fastapi.staticfiles import StaticFiles
-
+from app.api import send_mail 
 from app.api import api_faceRecognition, api_login
 from app.api import api_weeklySchedule, api_classSchedule, api_appointmentManager
 from app.api import api_accessData
@@ -71,7 +71,7 @@ def get_application() -> FastAPI:
     # application.include_router(api_faceRecognition.router, tags = ["faceRecognition"])   
     application.include_router(api_login.router, tags=["login"])  
     application.include_router(api_weeklySchedule.router, tags = ["weeklySchedule"])
-
+    application.include_router(send_mail.router, tags=["send_mail"])
     application.add_exception_handler(CustomException, http_exception_handler)
 
     application.mount("/static", StaticFiles(directory = "app/static"), name = "static")
